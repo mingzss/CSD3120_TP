@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "commonjs",
+        "noResolve": false,
+        "noImplicitAny": false,
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "isolatedModules": false,
+        "lib": [
+            "dom",
+            "es6",
+        ],
+        //"declaration": true, // Currently not impt for generating declarations
+        "outDir": "./src",
+        "types": [
+            "babylonjs",
+            "babylonjs-gui",
+            "node"
+        ]
+    },
+    "files": [
+        "./src/index.ts"
+    ]
+}
