@@ -8,6 +8,7 @@ import {
   Vector3,
   WebXRFeatureName,
 } from "babylonjs";
+import { Console } from "console";
 import { ECS } from "../ECS";
 
 /**
@@ -61,8 +62,9 @@ export class ControllerDrag {
                   selectedMesh.getAbsolutePosition()
                 );
                 // If the distance is less than 1, attach the mesh to the motion controller
-                if (distance < 1) {
+                if (distance < 10) {
                   selectedMesh.setParent(motioncontroller.rootMesh);
+                  console.log("rawr");
                 }
               }
             }

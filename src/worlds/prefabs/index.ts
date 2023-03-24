@@ -7,3 +7,7 @@ export * from "./H2"
 export * from "./O2"
 export * from "./table"
 export * from "./InfoText"
+
+export * from "./ChemistryEnvironment"
+export * from "./Beaker"
+export * from "./Tray"

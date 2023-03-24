@@ -15,7 +15,8 @@ import {Engine} from "babylonjs";
 import "babylonjs-loaders";
 import { AuthoringData } from "xrauthor-loader";
 import {ECS} from "./core"
-import {VRWorld} from "./worlds/VRWorld"
+import { ControllerDrag } from "./core/Features/ControllerDrag";
+import {TmpWorld} from "./worlds/TmpWorld"
 
 /*
     App class representing the application structure of the
@@ -40,7 +41,7 @@ export class App {
         // console.log(this.m_AuthoringData);
 
         // Build and Initialize ECS
-        this.m_ECS = new VRWorld(
+        this.m_ECS = new TmpWorld(
             this.m_Engine, 
             this.m_Canvas, 
             {
@@ -54,7 +55,6 @@ export class App {
                 }
             });
         this.m_ECS.Init();
-        
         return this.m_ECS;
     }
 }

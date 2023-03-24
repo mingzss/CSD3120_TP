@@ -10,7 +10,8 @@ import {
   Engine,
   Scene,
   UniversalCamera,
-  Vector3
+  Vector3,
+  ActionManager
 } from "babylonjs";
 import { ComponentManager } from "./ComponentManager";
 import { Entity } from "./Entity";
@@ -108,6 +109,7 @@ export class ECS extends Scene {
     super(engine);
     this.m_Engine = engine;
     this.m_Canvas = canvas;
+    this.actionManager = new ActionManager(this);
     this.SetupCamera(
       options == null
         ? {
