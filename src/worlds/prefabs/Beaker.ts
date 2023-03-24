@@ -27,7 +27,6 @@ export class Beaker extends Entity{
         // Load the Beaker model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
-            // Do nothing for now
             this.m_Model.m_Mesh.scaling.setAll(0.25);
         })
     }

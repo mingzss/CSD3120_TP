@@ -22,7 +22,7 @@ export class H2 extends Entity{
     Init(): void{
         // Add a Model component for the H2 molecule
         this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/Hydrogen.glb";
+        this.m_Model.m_AssetPath = "assets/models/H2.glb";
         
         // Load the H2 model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();

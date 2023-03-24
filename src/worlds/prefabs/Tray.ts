@@ -5,8 +5,10 @@
 import { ActionManager, ExecuteCodeAction, StandardMaterial } from "babylonjs";
 import {Entity, Model, TextPlane} from "../../core"
 import { TmpWorld } from "../TmpWorld";
-import { H2 } from "./H2";
-import { O2 } from "./O2";
+import { Carbon } from "./Atoms/Carbon";
+import { Chlorine } from "./Atoms/Chlorine";
+import { Hydrogen } from "./Atoms/Hydrogen";
+import { Oxygen } from "./Atoms/Oxygen";
 
 export class Tray extends Entity{
 
@@ -35,11 +37,7 @@ export class Tray extends Entity{
         // Load the Beaker model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
-            // Do nothing for now
             this.m_Model.m_Mesh.scaling.setAll(0.25);
-            // this.getChildMeshes().forEach((mesh)=>{
-            //     mesh.isPickable = false;
-            // })
             this.actionManager = this.m_Model.m_Mesh.actionManager = new ActionManager(this.m_Scene);
             this.InitAction();
         })
@@ -74,9 +72,13 @@ export class Tray extends Entity{
                 () => {
                     var tmpWorld = this.m_ECS as TmpWorld
                     if (this.m_Name == "Hydrogen")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(H2, "H2"));
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Hydrogen, "Hydrogen"));
                     else if (this.m_Name == "Oxygen")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(O2, "O2"));
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Oxygen, "Oxygen"));
+                    else if (this.m_Name == "Chlorine")
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Chlorine, "Chlorine"));
+                    else if (this.m_Name == "Carbon")
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Carbon, "Carbon"));
                 }
               )
         );
