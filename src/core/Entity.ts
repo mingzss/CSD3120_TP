@@ -2,7 +2,7 @@
     @file Entity.ts
     @brief A Entity class that serves as the base class for objects to hold components
 */
-import { Scene, TransformNode } from "babylonjs";
+import { ActionManager, Scene, TransformNode } from "babylonjs";
 import { ECS } from "./ECS";
 import { Component } from "./Components/Component";
 
@@ -39,6 +39,7 @@ export abstract class Entity extends TransformNode {
     this.m_Scene = ecs;
     this.m_ECS = ecs;
     this.m_Name = name;
+    //this.m_Scene.actionManager = new ActionManager(this.m_Scene);
     console.log("Entity " + this.m_Name + " created.");
   }
 

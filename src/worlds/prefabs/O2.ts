@@ -27,15 +27,16 @@ export class O2 extends Entity{
     */
     Init(): void{
         this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/O2.glb";
+        this.m_Model.m_AssetPath = "assets/models/Oxygen.glb";
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
+            this.position.set(0, 9, 0);
         })
 
-        const sphere = this.AddComponent(Sphere);
-        sphere.m_Mesh.position.set(0, 5, 0);
+        //const sphere = this.AddComponent(Sphere);
+        //sphere.m_Mesh.position.set(0, 5, 0);
         //sphere.m_Mesh.rotation.set(Math.PI, 0, 0);
-        (sphere.m_Mesh.material as StandardMaterial).diffuseTexture = new Texture("assets/textures/water.jpg", this.m_Scene);
+        //(sphere.m_Mesh.material as StandardMaterial).diffuseTexture = new Texture("assets/textures/water.jpg", this.m_Scene);
     }
 
     /**
