@@ -38,7 +38,35 @@ export class Tray extends Entity{
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
             this.m_Model.m_Mesh.scaling.setAll(0.25);
-            this.actionManager = this.m_Model.m_Mesh.actionManager = new ActionManager(this.m_Scene);
+            //this.actionManager = this.m_Model.m_Mesh.actionManager = new ActionManager(this.m_Scene);
+            if (this.m_Name == "Hydrogen")
+            {
+                this.m_Model.m_Mesh.getChildMeshes()[0].name = "HTray";
+                this.m_Model.m_Mesh.getChildMeshes()[0].id = "HTray";
+                this.actionManager = this.m_Scene.getLastMeshById("HTray").actionManager = new ActionManager(this.m_Scene);
+            }
+
+            else if (this.m_Name == "Oxygen")
+            {
+                this.m_Model.m_Mesh.getChildMeshes()[0].name = "OTray";
+                this.m_Model.m_Mesh.getChildMeshes()[0].id = "OTray";
+                this.actionManager = this.m_Scene.getLastMeshById("OTray").actionManager = new ActionManager(this.m_Scene);
+            }
+
+            else if (this.m_Name == "Chlorine")
+            {
+                this.m_Model.m_Mesh.getChildMeshes()[0].name = "CLTray";
+                this.m_Model.m_Mesh.getChildMeshes()[0].id = "CLTray";
+                this.actionManager = this.m_Scene.getLastMeshById("CLTray").actionManager = new ActionManager(this.m_Scene);
+            }
+
+            else if (this.m_Name == "Carbon")
+            {
+                this.m_Model.m_Mesh.getChildMeshes()[0].name = "CTray";
+                this.m_Model.m_Mesh.getChildMeshes()[0].id = "CTray";
+                this.actionManager = this.m_Scene.getLastMeshById("CTray").actionManager = new ActionManager(this.m_Scene);
+            }
+
             this.InitAction();
         })
 

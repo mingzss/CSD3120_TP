@@ -65,6 +65,7 @@ export class ControllerDrag {
                 if (distance < 10) {
                   selectedMesh.setParent(motioncontroller.rootMesh);
                   console.log("rawr");
+                  console.log("grabbed mesh is: " + selectedMesh.name)
                 }
               }
             }
