@@ -4,6 +4,7 @@
 */
 import { ActionManager, ExecuteCodeAction, StandardMaterial } from "babylonjs";
 import {Entity, Model, TextPlane} from "../../../core"
+import { TmpWorld } from "../../TmpWorld";
 
 export class Hydrogen extends Entity{
 
@@ -35,6 +36,11 @@ export class Hydrogen extends Entity{
         this.m_Promise.then(()=>{
             this.position.set(2, 6.4, 0);
             this.scaling.setAll(0.5);
+            this.m_Model.m_Mesh.name = this.name + " Mesh";
+            this.m_Model.m_Mesh.id = this.name + " Mesh";
+            this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
+            this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
+
             // this.m_TextPlane = this.AddComponent(TextPlane);
             // this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);
             // this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
@@ -46,9 +52,9 @@ export class Hydrogen extends Entity{
             // this.m_TextPlane.m_Mesh.isPickable = false;
             // this.m_TextPlane.m_TextBlock.text = this.m_Name;
             // (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
-            // this.actionManager = this.m_Model.m_Mesh.actionManager = new ActionManager(this.m_Scene);
+            this.actionManager = this.m_Scene.getLastMeshById(this.name + " Mesh").actionManager = new ActionManager(this.m_Scene);
             // this.m_TextPlane.m_Mesh.isVisible = false;
-            // this.InitAction();
+            this.InitAction();
         })
 
 
@@ -73,26 +79,25 @@ export class Hydrogen extends Entity{
 
     private InitAction(){
         this.actionManager.isRecursive = true;
-        this.actionManager.registerAction(
-            new ExecuteCodeAction(
-                {
-                    trigger: ActionManager.OnPickDownTrigger,
-                },
-                () => {
-                    this.m_TextPlane.m_Mesh.isVisible = true;
+        const otherMesh = this._scene.getMeshById("Sink");
+        this.actionManager.registerAction(new ExecuteCodeAction(
+            {
+              trigger: ActionManager.OnIntersectionEnterTrigger,
+              parameter: {
+                mesh: otherMesh,
+              },
+            },
+            () => {
+                var tmpWorld = this.m_ECS as TmpWorld
+                for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                    if (tmpWorld.m_Interactables[i].m_Name == this.name)
+                        tmpWorld.m_Interactables.splice(i, 1);
                 }
-              )
-        );
 
-        this.actionManager.registerAction(
-            new ExecuteCodeAction(
-                {
-                    trigger: ActionManager.OnPointerOutTrigger,
-                },
-                () => {
-                    this.m_TextPlane.m_Mesh.isVisible = false;
-                }
-              )
+                this.m_Model.m_Mesh.dispose();
+                this.dispose();
+            }
+          )
         );
     }
 }

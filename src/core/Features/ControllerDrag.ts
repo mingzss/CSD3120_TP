@@ -4,6 +4,7 @@
 */
 import {
   AbstractMesh,
+  Mesh,
   TransformNode,
   Vector3,
   WebXRFeatureName,
@@ -35,6 +36,7 @@ export class ControllerDrag {
   Enable() {
     // Declare some variables for use later
     let selectedMesh: AbstractMesh;
+    let rootMesh: AbstractMesh;
     let parentTransform: TransformNode;
 
     // Add a callback to run when a new motion controller is added to the scene
@@ -55,25 +57,35 @@ export class ControllerDrag {
                   controller.uniqueId
                 ))
             ) {
+              rootMesh = selectedMesh;
+              while (rootMesh.parent) {
+                //get top root of the mesh
+                if (
+                  rootMesh.name === "oculus-touch-left" ||
+                  rootMesh.name === "oculus-touch-right"
+                ) {
+                  return;
+                }
+                rootMesh = rootMesh.parent as Mesh;
+              }
               // If the mesh is not locked, calculate the distance between the mesh and the controller
-              if (!this.m_LockedMeshes.has(selectedMesh)) {
+              if (!this.m_LockedMeshes.has(rootMesh)) {
                 const distance = Vector3.Distance(
                   motioncontroller.rootMesh.getAbsolutePosition(),
                   selectedMesh.getAbsolutePosition()
                 );
                 // If the distance is less than 1, attach the mesh to the motion controller
                 if (distance < 10) {
-                  selectedMesh.setParent(motioncontroller.rootMesh);
-                  console.log("rawr");
-                  console.log("grabbed mesh is: " + selectedMesh.name)
+                  rootMesh.setParent(motioncontroller.rootMesh);
+                  console.log("grabbed mesh is: " + rootMesh.name)
                 }
               }
             }
           } else {
             // If the trigger is not pressed
-            if (selectedMesh && selectedMesh.parent) {
+            if (rootMesh && rootMesh.parent) {
               // If a mesh is attached to the motion controller
-              selectedMesh.setParent(parentTransform, true, true); // Detach the mesh
+              rootMesh.setParent(parentTransform, true, true); // Detach the mesh
             }
           }
         });

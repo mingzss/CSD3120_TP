@@ -3,12 +3,12 @@
     @brief Class representing an entity that loads and displays a 3D model of Beaker.
 */
 import { ActionManager, ExecuteCodeAction, StandardMaterial } from "babylonjs";
-import {Entity, Model, TextPlane} from "../../core"
-import { TmpWorld } from "../TmpWorld";
-import { Carbon } from "./Atoms/Carbon";
-import { Chlorine } from "./Atoms/Chlorine";
-import { Hydrogen } from "./Atoms/Hydrogen";
-import { Oxygen } from "./Atoms/Oxygen";
+import {Entity, Model, TextPlane} from "../../../core"
+import { TmpWorld } from "../../TmpWorld";
+import { Carbon } from "../Atoms/Carbon";
+import { Chlorine } from "../Atoms/Chlorine";
+import { Hydrogen } from "../Atoms/Hydrogen";
+import { Oxygen } from "../Atoms/Oxygen";
 
 export class Tray extends Entity{
 
@@ -76,13 +76,13 @@ export class Tray extends Entity{
                 () => {
                     var tmpWorld = this.m_ECS as TmpWorld
                     if (this.m_Name == "Hydrogen")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Hydrogen, "Hydrogen"));
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Hydrogen, "Hydrogen Atom"));
                     else if (this.m_Name == "Oxygen")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Oxygen, "Oxygen"));
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Oxygen, "Oxygen Atom"));
                     else if (this.m_Name == "Chlorine")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Chlorine, "Chlorine"));
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Chlorine, "Chlorine Atom"));
                     else if (this.m_Name == "Carbon")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Carbon, "Carbon"));
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Carbon, "Carbon Atom"));
                 }
               )
         );

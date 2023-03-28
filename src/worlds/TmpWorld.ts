@@ -14,7 +14,8 @@ import {
     InfoText,
     ChemistryEnvironment,
     Beaker,
-    Tray
+    Tray,
+    Sink
 } from "./prefabs"
 
 export class TmpWorld extends ECS{
@@ -60,8 +61,7 @@ export class TmpWorld extends ECS{
         const lightSource = this.m_LightSource1.m_PointLightSource.m_Light;
         lightSource.intensity = 1;
     
-        // Initialize all objects (H2, O2, Table, Information)
-        // O2/H2
+        // Initialize all objects
         this.m_Interactables.push(this.Instantiate(Beaker, "Beaker"));
         (this.m_Interactables[0] as Beaker).m_Promise.then(()=>{
             this.m_Interactables[0].position.set(2, 7, 5.6);
@@ -94,30 +94,17 @@ export class TmpWorld extends ECS{
             textPlane.m_TextBlock.text = "Chlorine";
         });
 
-        //this.m_Interactables.push(this.Instantiate(H2, "H2"));
+        this.m_Interactables.push(this.Instantiate(Sink, "Sink"));
 
         this.m_XRPromise.then(() => {
             this.m_ControllerDragFeature.Enable();
 
         })
-        // for (let i = 0; i < 2; ++i){
-        //     this.m_Interactables.push(this.Instantiate(H2, "H2"));
-        //     this.m_Interactables.push(this.Instantiate(O2, "O2"));
-        // }
-        // (this.m_Interactables[0] as H2).m_Promise.then(()=>{this.m_Interactables[0].position.set(1, 2, 0);});
-        // (this.m_Interactables[2] as H2).m_Promise.then(()=>{this.m_Interactables[2].position.set(1, 3, 0);});
-        // (this.m_Interactables[1] as O2).m_Promise.then(()=>{this.m_Interactables[1].position.set(-1, 3, 0);});
-        // (this.m_Interactables[3] as O2).m_Promise.then(()=>{this.m_Interactables[3].position.set(-1, 2, 0);});
 
-        // // Table
-        //const tableEnt = this.Instantiate(Table, "Table");
-        // tableEnt.position.set(0, -5, 0);
-        // tableEnt.scaling.setAll(10);
-
-        // // Information
+        // Information
         this.m_InfoText = this.Instantiate(InfoText, "InfoText");
 
-        // // Initialize Transform Widget
+        // Initialize Transform Widget
         this.m_TransformWidget = this.Instantiate(TransformWidget, "Transform Widget");
 
         // // Enable Teleportation (Only works with controllers)

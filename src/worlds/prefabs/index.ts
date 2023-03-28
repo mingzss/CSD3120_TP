@@ -9,8 +9,9 @@ export * from "./table"
 export * from "./InfoText"
 
 export * from "./ChemistryEnvironment"
-export * from "./Beaker"
-export * from "./Tray"
+export * from "./Interactables/Beaker"
+export * from "./Interactables/Tray"
+export * from "./Interactables/Sink"
 
 export * from "./Atoms/Hydrogen"
 export * from "./Atoms/Oxygen"

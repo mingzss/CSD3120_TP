@@ -2,7 +2,7 @@
     @file Beaker.ts
     @brief Class representing an entity that loads and displays a 3D model of Beaker.
 */
-import {Entity, Model} from "../../core"
+import {Entity, Model} from "../../../core"
 
 export class Beaker extends Entity{
 

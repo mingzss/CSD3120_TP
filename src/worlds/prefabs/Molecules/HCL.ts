@@ -2,7 +2,9 @@
     @file HCL.ts
     @brief Class representing an entity that loads and displays a 3D model of HCL molecules.
 */
+import { ActionManager, ExecuteCodeAction } from "babylonjs";
 import {Entity, Model} from "../../../core"
+import { TmpWorld } from "../../TmpWorld";
 
 export class HCL extends Entity{
 
@@ -10,6 +12,8 @@ export class HCL extends Entity{
      * @brief The model component for the HCL molecule.
      */
     m_Model: Model;
+
+    actionManager: ActionManager;
 
     /**
      * @brief A promise for loading the HCL model.
@@ -29,6 +33,13 @@ export class HCL extends Entity{
         this.m_Promise.then(()=>{
             this.position.set(2, 6.4, -3);
             this.scaling.setAll(0.5);
+
+            this.m_Model.m_Mesh.name = this.name + " Mesh";
+            this.m_Model.m_Mesh.id = this.name + " Mesh";
+            this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
+            this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
+            this.actionManager = this.m_Scene.getLastMeshById(this.name + " Mesh").actionManager = new ActionManager(this.m_Scene);
+            this.InitAction();
         })
     }
 
@@ -45,5 +56,28 @@ export class HCL extends Entity{
 
     public SetMeshVisibility(isVisible : boolean){
 
+    }
+
+    private InitAction(){
+        this.actionManager.isRecursive = true;
+        const otherMesh = this._scene.getMeshById("Sink");
+        this.actionManager.registerAction(new ExecuteCodeAction(
+            {
+              trigger: ActionManager.OnIntersectionEnterTrigger,
+              parameter: {
+                mesh: otherMesh,
+              },
+            },
+            () => {
+                var tmpWorld = this.m_ECS as TmpWorld
+                for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                    if (tmpWorld.m_Interactables[i].m_Name == this.name)
+                        tmpWorld.m_Interactables.splice(i, 1);
+                }
+                this.m_Model.m_Mesh.dispose();
+                this.dispose();
+            }
+          )
+        );
     }
 }
