@@ -12,6 +12,7 @@ export * from "./ChemistryEnvironment"
 export * from "./Interactables/Beaker"
 export * from "./Interactables/Tray"
 export * from "./Interactables/Sink"
+export * from "./Interactables/ResearchTray"
 
 export * from "./Atoms/Hydrogen"
 export * from "./Atoms/Oxygen"

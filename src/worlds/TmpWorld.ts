@@ -15,7 +15,8 @@ import {
     ChemistryEnvironment,
     Beaker,
     Tray,
-    Sink
+    Sink,
+    ResearchTray
 } from "./prefabs"
 
 export class TmpWorld extends ECS{
@@ -95,6 +96,8 @@ export class TmpWorld extends ECS{
         });
 
         this.m_Interactables.push(this.Instantiate(Sink, "Sink"));
+        this.m_Interactables.push(this.Instantiate(ResearchTray, "ResearchTray"));
+
 
         this.m_XRPromise.then(() => {
             this.m_ControllerDragFeature.Enable();

@@ -17,6 +17,12 @@ export class Tray extends Entity{
      */
     m_Model: Model;
 
+    hcounter: number;
+    ocounter: number;
+    ccounter: number;
+    clcounter: number;
+
+
     m_TextPlane: TextPlane;
 
     actionManager: ActionManager;
@@ -33,7 +39,10 @@ export class Tray extends Entity{
         // Add a Model component for the Tray
         this.m_Model = this.AddComponent(Model);
         this.m_Model.m_AssetPath = "assets/models/tray.glb";
-        
+        this.hcounter = 0;
+        this.ocounter = 0;
+        this.ccounter = 0;
+        this.clcounter = 0;
         // Load the Beaker model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
@@ -76,13 +85,29 @@ export class Tray extends Entity{
                 () => {
                     var tmpWorld = this.m_ECS as TmpWorld
                     if (this.m_Name == "Hydrogen")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Hydrogen, "Hydrogen Atom"));
+                    {
+                        var hName = "Hydrogen Atom " + this.hcounter.toString();
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Hydrogen, hName));
+                        this.hcounter++;
+                    }
                     else if (this.m_Name == "Oxygen")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Oxygen, "Oxygen Atom"));
+                    {
+                        var oName = "Oxygen Atom " + this.ocounter.toString();
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Oxygen, oName));
+                        this.ocounter++;
+                    }
                     else if (this.m_Name == "Chlorine")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Chlorine, "Chlorine Atom"));
-                    else if (this.m_Name == "Carbon")
-                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Carbon, "Carbon Atom"));
+                    {
+                        var clName = "Chlorine Atom " + this.clcounter.toString();
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Chlorine, clName));
+                        this.clcounter++;
+                    }
+                    else if (this.m_Name == "Carbon ")
+                    {
+                        var cName = "Carbon Atom " + this.ccounter.toString();
+                        tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Carbon, cName));
+                        this.ccounter++;
+                    }
                 }
               )
         );

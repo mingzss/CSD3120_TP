@@ -2,7 +2,6 @@
     @file Sink.ts
     @brief Class representing an entity that loads and displays a 3D model of Sink.
 */
-import { ActionManager, ExecuteCodeAction } from "babylonjs";
 import {Entity, Model} from "../../../core"
 
 export class Sink extends Entity{
@@ -11,7 +10,6 @@ export class Sink extends Entity{
      * @brief The model component for the Sink molecule.
      */
     m_Model: Model;
-    //actionManager: ActionManager;
 
 
     /**

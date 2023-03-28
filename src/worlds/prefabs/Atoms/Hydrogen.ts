@@ -5,6 +5,7 @@
 import { ActionManager, ExecuteCodeAction, StandardMaterial } from "babylonjs";
 import {Entity, Model, TextPlane} from "../../../core"
 import { TmpWorld } from "../../TmpWorld";
+import { ResearchTray } from "../Interactables/ResearchTray";
 
 export class Hydrogen extends Entity{
 
@@ -17,6 +18,8 @@ export class Hydrogen extends Entity{
 
     actionManager: ActionManager;
 
+    usingResearchTray: boolean;
+
     /**
      * @brief A promise for loading the Hydrogen model.
      */
@@ -27,9 +30,9 @@ export class Hydrogen extends Entity{
      */
     Init(): void{
         // Add a Model component for the Hydrogen molecule
-
         this.m_Model = this.AddComponent(Model);
         this.m_Model.m_AssetPath = "assets/models/Hydrogen.glb";
+        this.usingResearchTray = false;
 
         // Load the Hydrogen model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
@@ -41,25 +44,22 @@ export class Hydrogen extends Entity{
             this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
             this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
 
-            // this.m_TextPlane = this.AddComponent(TextPlane);
-            // this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);
-            // this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
-            // this.m_TextPlane.m_GUITexture.background = "purple";
-            // this.m_TextPlane.m_TextBlock.color = "white";
-            // this.m_TextPlane.m_Mesh.scaling.setAll(1);
-            // this.m_TextPlane.m_TextBlock.fontSize = 10;
-            // this.m_TextPlane.m_TextBlock.textWrapping = true;
-            // this.m_TextPlane.m_Mesh.isPickable = false;
-            // this.m_TextPlane.m_TextBlock.text = this.m_Name;
-            // (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
+            this.m_TextPlane = this.AddComponent(TextPlane);
+            this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);
+            this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
+            this.m_TextPlane.m_GUITexture.background = "purple";
+            this.m_TextPlane.m_TextBlock.color = "white";
+            this.m_TextPlane.m_Mesh.scaling.setAll(1);
+            this.m_TextPlane.m_TextBlock.fontSize = 10;
+            this.m_TextPlane.m_TextBlock.textWrapping = true;
+            this.m_TextPlane.m_Mesh.isPickable = false;
+            this.m_TextPlane.m_TextBlock.text = this.m_Name + "(H)";
+            (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
+
             this.actionManager = this.m_Scene.getLastMeshById(this.name + " Mesh").actionManager = new ActionManager(this.m_Scene);
-            // this.m_TextPlane.m_Mesh.isVisible = false;
+            this.m_TextPlane.m_Mesh.isVisible = false;
             this.InitAction();
         })
-
-
-
-
     }
 
     /**
@@ -69,16 +69,85 @@ export class Hydrogen extends Entity{
 
     }
 
-    public SetLabelVisibility(isVisible : boolean){
-
-    }
-
-    public SetMeshVisibility(isVisible : boolean){
-
-    }
-
     private InitAction(){
         this.actionManager.isRecursive = true;
+        const researchTray = this._scene.getMeshById("ResearchTray");
+        this.actionManager.registerAction(new ExecuteCodeAction(
+            {
+              trigger: ActionManager.OnIntersectionEnterTrigger,
+              parameter: {
+                mesh: researchTray,
+                usePreciseIntersection: true
+              },
+            },
+            () => {
+                var tmpWorld = this.m_ECS as TmpWorld
+                for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                    if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray")
+                    {
+                        var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
+                        if (researchTrayEntity.inUse) break;
+                        else {
+                            researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine four hydrogen with one carbon to get CH4 or two hydrogen with one oxygen to get H2O or combine with one chlorine to get HCL"
+                            researchTrayEntity.inUse = true;
+                            this.usingResearchTray = true;
+                            break;
+                        }
+                    }
+                }
+            }
+          )
+        );
+
+        this.actionManager.registerAction(new ExecuteCodeAction(
+            {
+              trigger: ActionManager.OnIntersectionExitTrigger,
+              parameter: {
+                mesh: researchTray,
+                usePreciseIntersection: true
+              },
+            },
+            () => {
+                if (this.usingResearchTray)
+                {
+                    var tmpWorld = this.m_ECS as TmpWorld
+                    for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                        if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray")
+                        {
+                            var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
+                            researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
+                            researchTrayEntity.inUse = false;
+                            this.usingResearchTray = false;
+                            break;
+                        }
+                    }
+                }
+            }
+          )
+        );
+
+        this.actionManager.registerAction(
+            new ExecuteCodeAction(
+                {
+                    trigger: ActionManager.OnPickDownTrigger,
+                },
+                () => {
+                    this.m_TextPlane.m_Mesh.isVisible = true;
+                }
+              )
+        );
+
+        this.actionManager.registerAction(
+            new ExecuteCodeAction(
+                {
+                    trigger: ActionManager.OnPickUpTrigger,
+                },
+                () => {
+                    this.m_TextPlane.m_Mesh.isVisible = false;
+                }
+              )
+        );
+
         const otherMesh = this._scene.getMeshById("Sink");
         this.actionManager.registerAction(new ExecuteCodeAction(
             {
@@ -95,6 +164,7 @@ export class Hydrogen extends Entity{
                 }
 
                 this.m_Model.m_Mesh.dispose();
+                this.m_TextPlane.m_Mesh.dispose();
                 this.dispose();
             }
           )
