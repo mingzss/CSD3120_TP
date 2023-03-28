@@ -102,7 +102,7 @@ export class Tray extends Entity{
                         tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Chlorine, clName));
                         this.clcounter++;
                     }
-                    else if (this.m_Name == "Carbon ")
+                    else if (this.m_Name == "Carbon")
                     {
                         var cName = "Carbon Atom " + this.ccounter.toString();
                         tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Carbon, cName));

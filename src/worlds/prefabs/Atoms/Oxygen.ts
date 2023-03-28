@@ -5,6 +5,7 @@
 import { AbstractMesh, ActionManager, ExecuteCodeAction, SixDofDragBehavior, StandardMaterial, Vector3, } from "babylonjs";
 import {Entity, Model, TextPlane} from "../../../core"
 import { TmpWorld } from "../../TmpWorld";
+import { Beaker } from "../Interactables/Beaker";
 import { ResearchTray } from "../Interactables/ResearchTray";
 
 /**
@@ -26,7 +27,7 @@ export class Oxygen extends Entity{
     actionManager: ActionManager;
 
     placedInBeaker: boolean;
-    sixDofDragBehavior: SixDofDragBehavior;
+    //sixDofDragBehavior: SixDofDragBehavior;
     /**
         @brief A promise representing the loading of the Oxygen atom.
     */
@@ -39,7 +40,8 @@ export class Oxygen extends Entity{
         this.m_Model = this.AddComponent(Model);
         this.m_Model.m_AssetPath = "assets/models/Oxygen.glb";
         this.usingResearchTray = false;
-        
+        this.placedInBeaker = false;
+
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
             this.position.set(2, 6.4, 3);
@@ -63,8 +65,8 @@ export class Oxygen extends Entity{
             
             this.actionManager = this.m_Scene.getLastMeshById(this.name + " Mesh").actionManager = new ActionManager(this.m_Scene);
             this.m_TextPlane.m_Mesh.isVisible = false;
-            this.sixDofDragBehavior = new SixDofDragBehavior();
-            this.m_Model.m_Entity.addBehavior(this.sixDofDragBehavior);
+            //this.sixDofDragBehavior = new SixDofDragBehavior();
+            //this.m_Model.m_Entity.addBehavior(this.sixDofDragBehavior);
             this.InitAction();
         })
     }
@@ -185,7 +187,6 @@ export class Oxygen extends Entity{
         );
 
         const beakerMesh = this._scene.getMeshById("Beaker");
-        this.placedInBeaker = false;
         this.actionManager.registerAction(new ExecuteCodeAction(
             {
               trigger: ActionManager.OnIntersectionEnterTrigger,
@@ -202,23 +203,26 @@ export class Oxygen extends Entity{
                     this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
                     let atomParent: AbstractMesh;
                     atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
-    
+                    
                     atomParent.setParent(null);
-                    //atomParent.position = beakerMesh.position;
+                    
+                    var tmpWorld = this.m_ECS as TmpWorld;
+                    tmpWorld.m_TransformWidget.m_DraggablePicked = false;
+                    tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
                     console.log("setting parent");
                     atomParent.setParent(beakerMesh);
                     atomParent.position = Vector3.Random(-1, 1);
                     this.placedInBeaker = true;
-                    this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
-                    // var tmpWorld = this.m_ECS as TmpWorld
-                    // for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-                    //     if (tmpWorld.m_Interactables[i].m_Name == this.name)
-                    //         tmpWorld.m_Interactables.splice(i, 1);
-                    // }
-    
-                    // this.m_Model.m_Mesh.dispose();
-                    // this.m_TextPlane.m_Mesh.dispose();
-                    // this.dispose();
+                    var tmpWorld = this.m_ECS as TmpWorld;
+                    for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                        if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
+                        {
+                            console.log("found beaker!");
+                            var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
+                            beakerEntity.oxygenCounter++;
+                            break;
+                        }
+                    }
                 }
 
             }

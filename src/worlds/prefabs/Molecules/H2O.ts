@@ -39,7 +39,9 @@ export class H2O extends Entity{
         this.m_Promise.then(()=>{
             this.position.set(2, 6.4, -3);
             this.scaling.setAll(0.5);
-
+            var tmp = this.m_Scene.getTransformNodeById("Beaker");
+            this.position.set(tmp.absolutePosition._x, 0.15 + tmp.absolutePosition._y, tmp.absolutePosition._z);
+            
             this.m_Model.m_Mesh.name = this.name + " Mesh";
             this.m_Model.m_Mesh.id = this.name + " Mesh";
             this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";

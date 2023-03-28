@@ -2,9 +2,10 @@
     @file Hydrogen.ts
     @brief Class representing an entity that loads and displays a 3D model of Hydrogen atom.
 */
-import { ActionManager, ExecuteCodeAction, StandardMaterial } from "babylonjs";
+import { AbstractMesh, ActionManager, ExecuteCodeAction, StandardMaterial, Vector3 } from "babylonjs";
 import {Entity, Model, TextPlane} from "../../../core"
 import { TmpWorld } from "../../TmpWorld";
+import { Beaker } from "../Interactables/Beaker";
 import { ResearchTray } from "../Interactables/ResearchTray";
 
 export class Hydrogen extends Entity{
@@ -20,6 +21,7 @@ export class Hydrogen extends Entity{
 
     usingResearchTray: boolean;
 
+    placedInBeaker: boolean;
     /**
      * @brief A promise for loading the Hydrogen model.
      */
@@ -33,6 +35,7 @@ export class Hydrogen extends Entity{
         this.m_Model = this.AddComponent(Model);
         this.m_Model.m_AssetPath = "assets/models/Hydrogen.glb";
         this.usingResearchTray = false;
+        this.placedInBeaker = false;
 
         // Load the Hydrogen model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
@@ -166,6 +169,51 @@ export class Hydrogen extends Entity{
                 this.m_Model.m_Mesh.dispose();
                 this.m_TextPlane.m_Mesh.dispose();
                 this.dispose();
+            }
+          )
+        );
+
+        const beakerMesh = this._scene.getMeshById("Beaker");
+        this.placedInBeaker = false;
+        this.actionManager.registerAction(new ExecuteCodeAction(
+            {
+              trigger: ActionManager.OnIntersectionEnterTrigger,
+              parameter: {
+                mesh: beakerMesh,
+                usePreciseIntersection: false
+              },
+            },
+            () => {
+                //make model.mesh a child of beaker and snap pos
+
+                if (this.placedInBeaker == false) {
+                    console.log("intersecting w beaker " + this.m_Model.m_Mesh.parent.name);
+                    this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
+                    let atomParent: AbstractMesh;
+                    atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
+                    
+                    atomParent.setParent(null);
+
+                    var tmpWorld = this.m_ECS as TmpWorld;
+                    tmpWorld.m_TransformWidget.m_DraggablePicked = false;
+                    tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
+                    console.log("setting parent");
+                    atomParent.setParent(beakerMesh);
+                    atomParent.position = Vector3.Random(-1, 1);
+                    this.placedInBeaker = true;
+
+                    var tmpWorld = this.m_ECS as TmpWorld;
+                    for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                        if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
+                        {
+                            console.log("found beaker!");
+                            var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
+                            beakerEntity.hydrogenCounter++;
+                            break;
+                        }
+                    }
+                }
+
             }
           )
         );
