@@ -85,7 +85,10 @@ export class ControllerDrag {
             // If the trigger is not pressed
             if (rootMesh && rootMesh.parent) {
               // If a mesh is attached to the motion controller
-              rootMesh.setParent(parentTransform, true, true); // Detach the mesh
+              console.log("detaching mesh: " + rootMesh.name);
+              if (rootMesh.parent.name === "oculus-touch-left" || rootMesh.parent.name === "oculus-touch-right") {
+                rootMesh.setParent(parentTransform, true, true); // Detach the mesh
+              }
             }
           }
         });

@@ -108,7 +108,7 @@ export class TmpWorld extends ECS{
         this.m_InfoText = this.Instantiate(InfoText, "InfoText");
 
         // Initialize Transform Widget
-        this.m_TransformWidget = this.Instantiate(TransformWidget, "Transform Widget");
+        //this.m_TransformWidget = this.Instantiate(TransformWidget, "Transform Widget");
 
         // // Enable Teleportation (Only works with controllers)
         // const arrowMaterial = new StandardMaterial("Arrow Material", this);
@@ -147,7 +147,7 @@ export class TmpWorld extends ECS{
             entity.Update();
         })
 
-        this.m_TransformWidget.Update();
+        //this.m_TransformWidget.Update();
         
     }
 }
