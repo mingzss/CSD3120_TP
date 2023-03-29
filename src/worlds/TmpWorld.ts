@@ -32,7 +32,7 @@ export class TmpWorld extends ECS{
     // Objects
     m_Interactables = Array<Entity>();
 
-    
+    h2oCounter: number;
 
     // Information Entity
     m_InfoText: InfoText;
@@ -51,7 +51,7 @@ export class TmpWorld extends ECS{
         (this.m_Camera as UniversalCamera).rotation.set(0.17, -1.6, 0);
         (this.m_Camera as UniversalCamera).position.set(16, 8, 0);
 
-
+        this.h2oCounter = 0;
         // Initialize all lights
         this.m_ChemistryEnvironment = this.Instantiate(ChemistryEnvironment, "Environment");
         const ambientLight = this.m_ChemistryEnvironment.m_AmbientLightSource.m_Light;
@@ -96,6 +96,10 @@ export class TmpWorld extends ECS{
         });
 
         this.m_Interactables.push(this.Instantiate(Sink, "Sink"));
+        this.m_Interactables.push(this.Instantiate(Sink, "Sink2"));
+        (this.m_Interactables[6] as Tray).m_Promise.then(()=>{
+            this.m_Interactables[6].position.set(-0.5, 5.5, -10.86);
+        });
         this.m_Interactables.push(this.Instantiate(ResearchTray, "ResearchTray"));
 
 

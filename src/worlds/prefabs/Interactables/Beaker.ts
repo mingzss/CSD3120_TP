@@ -24,6 +24,7 @@ export class Beaker extends Entity{
     chlorineCounter: number;
     hydrogenCounter: number;
     oxygenCounter: number;
+
     /**
      * @brief Initializes the entity by loading and displaying the Beaker model.
      */
@@ -81,13 +82,19 @@ export class Beaker extends Entity{
                     console.log(this.hydrogenCounter + " h and o: " + this.oxygenCounter);
                     var tmpWorld = this.m_ECS as TmpWorld;
                     if (this.hydrogenCounter === 2 && this.oxygenCounter === 1) { //H2O
-                        var h2oEntity = tmpWorld.Instantiate(H2O, "H20");
+                        var hName = "H2O Molecule " + tmpWorld.h2oCounter.toString();
+                        var h2oEntity = tmpWorld.Instantiate(H2O, hName);
+                        tmpWorld.h2oCounter++;
                         h2oEntity.m_Promise.then(() => {
+                            console.log("H2O Promise: " + this.name);
                             for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                                 if (tmpWorld.m_Interactables[i].m_Name == this.name)
+                                {
                                     tmpWorld.m_Interactables.splice(i, 1);
                                     break;
+                                }
                             }
+                            tmpWorld.m_Interactables.push(h2oEntity);
                             var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
                             newBeakerEntity.position.set(2, 7, 5.6);
                             tmpWorld.m_Interactables.push(newBeakerEntity);

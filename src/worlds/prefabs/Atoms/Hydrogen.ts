@@ -40,7 +40,8 @@ export class Hydrogen extends Entity{
         // Load the Hydrogen model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
-            this.position.set(2, 6.4, 0);
+            var tmp = this.m_Scene.getTransformNodeById("Hydrogen");
+            this.position.set(tmp.absolutePosition._x, 0.15 + tmp.absolutePosition._y, tmp.absolutePosition._z);
             this.scaling.setAll(0.5);
             this.m_Model.m_Mesh.name = this.name + " Mesh";
             this.m_Model.m_Mesh.id = this.name + " Mesh";
@@ -173,6 +174,27 @@ export class Hydrogen extends Entity{
           )
         );
 
+        const otherMesh2 = this._scene.getMeshById("Sink2");
+        this.actionManager.registerAction(new ExecuteCodeAction(
+            {
+              trigger: ActionManager.OnIntersectionEnterTrigger,
+              parameter: {
+                mesh: otherMesh2,
+              },
+            },
+            () => {
+                var tmpWorld = this.m_ECS as TmpWorld
+                for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                    if (tmpWorld.m_Interactables[i].m_Name == this.name)
+                        tmpWorld.m_Interactables.splice(i, 1);
+                }
+                this.m_Model.m_Mesh.dispose();
+                this.m_TextPlane.m_Mesh.dispose();
+                this.dispose();
+            }
+          )
+        );
+
         const beakerMesh = this._scene.getMeshById("Beaker");
         this.placedInBeaker = false;
         this.actionManager.registerAction(new ExecuteCodeAction(
@@ -209,6 +231,7 @@ export class Hydrogen extends Entity{
                             console.log("found beaker!");
                             var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
                             beakerEntity.hydrogenCounter++;
+                            console.log(beakerEntity.hydrogenCounter);
                             break;
                         }
                     }

@@ -170,5 +170,26 @@ export class CO2 extends Entity{
             }
           )
         );
+
+        const otherMesh2 = this._scene.getMeshById("Sink2");
+        this.actionManager.registerAction(new ExecuteCodeAction(
+            {
+              trigger: ActionManager.OnIntersectionEnterTrigger,
+              parameter: {
+                mesh: otherMesh2,
+              },
+            },
+            () => {
+                var tmpWorld = this.m_ECS as TmpWorld
+                for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                    if (tmpWorld.m_Interactables[i].m_Name == this.name)
+                        tmpWorld.m_Interactables.splice(i, 1);
+                }
+                this.m_Model.m_Mesh.dispose();
+                this.m_TextPlane.m_Mesh.dispose();
+                this.dispose();
+            }
+          )
+        );
     }
 }
