@@ -70,7 +70,41 @@ export class Hydrogen extends Entity{
      * @brief Empty method to satisfy the abstract class Entity.
      */
     Update(): void {
-
+      this.m_Promise.then(()=>{
+        const beakerMesh = this._scene.getMeshById("Beaker");
+        const currMesh = this.m_Scene.getLastMeshById(this.name + " Mesh");
+        if (beakerMesh === null || currMesh === null) return;
+        if (beakerMesh.intersectsMesh(currMesh))
+        {
+          if (this.placedInBeaker == false) {
+            console.log("intersecting w beaker " + this.m_Model.m_Mesh.parent.name);
+            this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
+            let atomParent: AbstractMesh;
+            atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
+            
+            atomParent.setParent(null);
+            //atomParent.position = beakerMesh.position;
+            var tmpWorld = this.m_ECS as TmpWorld;
+            tmpWorld.m_TransformWidget.m_DraggablePicked = false;
+            tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
+            console.log("setting parent");
+            atomParent.setParent(beakerMesh);
+            atomParent.position = Vector3.Random(-1, 1);
+            this.placedInBeaker = true;
+            //this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
+            var tmpWorld = this.m_ECS as TmpWorld;
+            for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+                if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
+                {
+                    console.log("found beaker!");
+                    var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
+                    beakerEntity.hydrogenCounter++;
+                    break;
+                }
+            }
+        }
+        }
+      });
     }
 
     private InitAction(){
@@ -161,6 +195,7 @@ export class Hydrogen extends Entity{
               },
             },
             () => {
+              if (this.parent.name === "Beaker") return;
                 var tmpWorld = this.m_ECS as TmpWorld
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                     if (tmpWorld.m_Interactables[i].m_Name == this.name)
@@ -183,6 +218,7 @@ export class Hydrogen extends Entity{
               },
             },
             () => {
+              if (this.parent.name === "Beaker") return;
                 var tmpWorld = this.m_ECS as TmpWorld
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                     if (tmpWorld.m_Interactables[i].m_Name == this.name)
@@ -195,50 +231,50 @@ export class Hydrogen extends Entity{
           )
         );
 
-        const beakerMesh = this._scene.getMeshById("Beaker");
-        this.placedInBeaker = false;
-        this.actionManager.registerAction(new ExecuteCodeAction(
-            {
-              trigger: ActionManager.OnIntersectionEnterTrigger,
-              parameter: {
-                mesh: beakerMesh,
-                usePreciseIntersection: false
-              },
-            },
-            () => {
-                //make model.mesh a child of beaker and snap pos
+        // const beakerMesh = this._scene.getMeshById("Beaker");
+        // this.placedInBeaker = false;
+        // this.actionManager.registerAction(new ExecuteCodeAction(
+        //     {
+        //       trigger: ActionManager.OnIntersectionEnterTrigger,
+        //       parameter: {
+        //         mesh: beakerMesh,
+        //         usePreciseIntersection: false
+        //       },
+        //     },
+        //     () => {
+        //         //make model.mesh a child of beaker and snap pos
 
-                if (this.placedInBeaker == false) {
-                    console.log("intersecting w beaker " + this.m_Model.m_Mesh.parent.name);
-                    this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
-                    let atomParent: AbstractMesh;
-                    atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
+        //         if (this.placedInBeaker == false) {
+        //             console.log("intersecting w beaker " + this.m_Model.m_Mesh.parent.name);
+        //             this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
+        //             let atomParent: AbstractMesh;
+        //             atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
                     
-                    atomParent.setParent(null);
+        //             atomParent.setParent(null);
 
-                    var tmpWorld = this.m_ECS as TmpWorld;
-                    tmpWorld.m_TransformWidget.m_DraggablePicked = false;
-                    tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
-                    console.log("setting parent");
-                    atomParent.setParent(beakerMesh);
-                    atomParent.position = Vector3.Random(-1, 1);
-                    this.placedInBeaker = true;
+        //             var tmpWorld = this.m_ECS as TmpWorld;
+        //             tmpWorld.m_TransformWidget.m_DraggablePicked = false;
+        //             tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
+        //             console.log("setting parent");
+        //             atomParent.setParent(beakerMesh);
+        //             atomParent.position = Vector3.Random(-1, 1);
+        //             this.placedInBeaker = true;
 
-                    var tmpWorld = this.m_ECS as TmpWorld;
-                    for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-                        if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
-                        {
-                            console.log("found beaker!");
-                            var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
-                            beakerEntity.hydrogenCounter++;
-                            console.log(beakerEntity.hydrogenCounter);
-                            break;
-                        }
-                    }
-                }
+        //             var tmpWorld = this.m_ECS as TmpWorld;
+        //             for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
+        //                 if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
+        //                 {
+        //                     console.log("found beaker!");
+        //                     var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
+        //                     beakerEntity.hydrogenCounter++;
+        //                     console.log(beakerEntity.hydrogenCounter + "beaker unique id: " + beakerEntity.uniqueId);
+        //                     break;
+        //                 }
+        //             }
+        //         }
 
-            }
-          )
-        );
+        //     }
+        //   )
+        // );
     }
 }
