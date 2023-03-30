@@ -39,7 +39,6 @@ export class TransformWidget extends Entity{
     m_Camera: Camera;
 
     // Child Entities
-    m_MiniSphere: Sphere;
     m_ProgressBar: ProgressBar;
     m_UIPopup: UIPopup;
 
@@ -86,16 +85,6 @@ export class TransformWidget extends Entity{
         this.m_CameraToPickedTargetLine.setEnabled(false);
         this.m_CameraToPickedTargetLine.setParent(this);
         this.m_CameraToPickedTargetLine.isPickable = false;
-        
-        // Mini Sphere
-        this.m_MiniSphere = this.AddComponent(Sphere);
-        this.m_MiniSphere.m_Mesh.isPickable = false;
-        this.m_MiniSphere.m_Mesh.scaling.setAll(0.1);
-        this.m_MiniSphere.m_Mesh.renderingGroupId = 2;
-        const sphere_mat = this.m_MiniSphere.m_Mesh.material as StandardMaterial;
-        sphere_mat.disableLighting = true;
-        sphere_mat.emissiveColor = Color3.Gray();
-        //this.m_MiniSphere.m_Mesh.setEnabled(false);
 
         // Progress Bar
         this.m_ProgressBar = (this.m_Scene as ECS).Instantiate(ProgressBar, "Transform Widget Hold Bar");
@@ -121,12 +110,10 @@ export class TransformWidget extends Entity{
                     var pickResult = this.m_Scene.pick(this.m_Scene.pointerX, this.m_Scene.pointerY);
                     if (pickResult.hit && pickResult.pickedMesh != null && pickResult.pickedPoint != null){
                         // Ignore GUI planes (These cannot be set to isPickable = false else gui stops working)
-                        if (pickResult.pickedMesh == this.m_UIPopup.m_Plane.m_Mesh ||
-                            pickResult.pickedMesh == this.m_UIPopup.m_MergePlane.m_Mesh) return;
+                        if (pickResult.pickedMesh == this.m_UIPopup.m_Plane.m_Mesh) return;
                         
                         // Disable other controls
                         this.m_UIPopup.m_Plane.Disable();
-                        this.m_UIPopup.m_MergePlane.Disable();
 
                         // Store Pick Information
                         this.m_DraggablePicked = true;
@@ -148,7 +135,6 @@ export class TransformWidget extends Entity{
                                 this.m_DraggedObject.setParent(this.m_Camera);
                                 break;
                             case InteractState.Scale:
-                                this.m_InitialDragObjectScale = this.m_DraggedObject.scaling.clone();        
                                 break;
                             case InteractState.Rotate:
                                 const rotation = this.m_DraggedObject.rotation.clone();
@@ -161,7 +147,6 @@ export class TransformWidget extends Entity{
 
                         // Show Line Mesh Widget
                         this.m_CameraToPickedTargetLine.setEnabled(true);
-                        //this.m_MiniSphere.m_Mesh.setEnabled(true);
 
                         // Start Progress Bar and Set positions
                         this.m_ProgressBar.OnPickedDown(this.m_DraggedObject);
@@ -170,7 +155,6 @@ export class TransformWidget extends Entity{
                     } else {
                         // Reset selection and drag informations
                         this.m_UIPopup.m_Plane.Disable();
-                        this.m_UIPopup.m_MergePlane.Disable();
                         this.m_DraggedObject = null;
                         this.m_DraggedMesh = null;
                     }
@@ -195,32 +179,12 @@ export class TransformWidget extends Entity{
                         // Reset all drag information
                         this.m_DraggablePicked = false;
                         this.m_CameraToPickedTargetLine.setEnabled(false);
-                        //this.m_MiniSphere.m_Mesh.setEnabled(false);
 
                         if (this.m_DraggedObject != null){
                             // Show Transformation GUI if conditions are met
                             if (this.m_ProgressBar.OnPointerMoveOrUp(this.m_DraggedObject, false)){
                                 // OPEN GUI
                                 this.m_UIPopup.m_Plane.Enable();
-                            } else {
-                                // Else check for merge/split GUI
-                                const hasIntersection = this.IntersectionTest(this.m_DraggedObject).size > 0;
-                                if (hasIntersection){
-                                    this.m_UIPopup.position = this.m_ProgressBar.m_OuterSpinner.position.add(new Vector3(0, 0.25, 0));
-                                    this.m_UIPopup.m_MergeButton.isEnabled = true;
-                                    this.m_UIPopup.m_SplitButton.isEnabled = this.m_MergedMeshes.has(this.m_DraggedObject);
-                                    this.m_UIPopup.m_MergePlane.Enable();
-                                    this.m_MeshToMergeSplit = this.m_DraggedMesh;
-                                }
-                                else{
-                                    // Check if its merged
-                                    if (this.m_MergedMeshes.has(this.m_DraggedObject)){
-                                        this.m_UIPopup.m_MergePlane.Enable();
-                                        this.m_UIPopup.m_MergeButton.isEnabled = false;
-                                        this.m_UIPopup.m_SplitButton.isEnabled = true;
-                                        this.m_MeshToMergeSplit = this.m_DraggedMesh;
-                                    } 
-                                }
                             }
                             this.m_UIPopup.position = this.m_ProgressBar.m_OuterSpinner.position.add(new Vector3(0, 0.25, 0));
                             this.m_DraggedObject = null;
@@ -228,15 +192,6 @@ export class TransformWidget extends Entity{
                     }
                     break;
             }
-        });
-        
-        // Add observables for merging/splitting meshes
-        this.m_UIPopup.m_MergeButton.onPointerClickObservable.add(()=>{
-            this.MergeMeshes();
-        });
-
-        this.m_UIPopup.m_SplitButton.onPointerClickObservable.add(()=>{
-            this.SplitMeshes();
         });
     }
 
@@ -253,15 +208,12 @@ export class TransformWidget extends Entity{
             switch(this.m_UIPopup.m_DragState)
             {
                 case InteractState.Translate:
-                    // Move sphere to point
-                    this.m_MiniSphere.m_Mesh.position = this.m_InitialPickedPoint;
                     break;
                 case InteractState.Scale:
                     {
-                        // Calculate scale offset
-                        const offset = pickedPoint.subtract(this.m_InitialCameraPoint).scale(1);
-                        this.m_DraggedObject.scaling = this.m_InitialDragObjectScale.add(offset);
-                        this.m_MiniSphere.m_Mesh.position = pickedPoint;
+                        // // Calculate scale offset
+                        // const offset = pickedPoint.subtract(this.m_InitialCameraPoint).scale(1);
+                        // this.m_DraggedObject.scaling = this.m_InitialDragObjectScale.add(offset);
                     }
                     break;
                 case InteractState.Rotate:
@@ -270,142 +222,16 @@ export class TransformWidget extends Entity{
                         this.m_DraggedObject.lookAt(pickedPoint, 0, 0, 0, Space.WORLD);
                         this.m_DraggedObject.rotation.x = Math.PI / 2 - this.m_DraggedObject.rotation.x;
                         this.m_DraggedObject.rotation = this.m_DraggedObject.rotation.subtract(this.m_InitialDragObjectRotationOffset);        
-                        this.m_MiniSphere.m_Mesh.position = pickedPoint;
                     }
                     break;
             }
-            // Form Lines to connect the sphere to points of interest
-            this.m_CameraToPickedTargetLine = MeshBuilder.CreateLines(
-                this.m_CameraToPickedTargetLine.name,{
-                    points: [
-                        this.m_InitialPickedPoint,
-                        pickedPoint
-                    ],
-                    updatable: true,
-                    instance: this.m_CameraToPickedTargetLine
-                }, this.m_Scene);
             
             //Loop through each pickable mesh and check for intersections with other meshes
             this.IntersectionTest(this.m_DraggedObject);
-        } else {
-            // Change Color of Sphere to indicate gaze click will be successful
-            this.m_MiniSphere.m_Mesh.position = this.m_Camera.position.add(this.m_Camera.getForwardRay(1).direction.scale(20));
-            var pickResult = this.m_Scene.pick(this.m_Scene.pointerX, this.m_Scene.pointerY);
-                    if (pickResult.hit && pickResult.pickedMesh != null && pickResult.pickedPoint != null){
-                        if (pickResult.pickedMesh == this.m_UIPopup.m_Plane.m_Mesh ||
-                            pickResult.pickedMesh == this.m_UIPopup.m_MergePlane.m_Mesh) return;
-                        (this.m_MiniSphere.m_Mesh.material as StandardMaterial).emissiveColor = Color3.Red();
-                    } else {
-                        (this.m_MiniSphere.m_Mesh.material as StandardMaterial).emissiveColor = Color3.Gray();
-                    }
         }
 
         // Update the progress bar
         this.m_ProgressBar.Update();
-    }
-   
-    /**
-     * @brief Function that merges all mesh that intersects with m_MeshToMergeSplit
-     * @returns void
-     */
-    MergeMeshes(){
-
-        // Retrieve high level parent and perform intersection tests
-        const tNode1 = this.GetFirstLevelParent(this.m_MeshToMergeSplit);
-        const allIntersections = this.IntersectionTest(tNode1);
-        if (allIntersections.size == 0) return;
-
-        if (!this.m_MergedMeshes.has(tNode1)){
-
-            // If this object was not merged before, create a new parent and parent both under this parent
-            const newParent = new TransformNode("Merged Parent", this.m_Scene);
-            newParent.position.setAll(0);
-
-            // Calculate new parent position inbtwn all meshes
-            newParent.position = newParent.position.add(tNode1.position);
-
-            allIntersections.forEach((tNodeInt)=>{
-                newParent.position = newParent.position.add(tNodeInt.position);
-            });
-            
-            newParent.position = newParent.position.scale(1.0 / (allIntersections.size + 1));
-
-            // Parent all intersected mesh under this parent
-            tNode1.setParent(newParent);
-
-            allIntersections.forEach((tNodeInt)=>{
-                tNodeInt.setParent(newParent);
-
-                // Draw a line to show they are bound tgt
-                const binding = MeshBuilder.CreateLines("Binding",{
-                    points: [tNode1.getAbsolutePosition(), tNodeInt.getAbsolutePosition()],
-                }, this.m_Scene);
-                binding.isPickable = false;
-
-                // To prevent bounding box from showing
-                binding.getBoundingInfo().maximum.setAll(0);
-                binding.getBoundingInfo().minimum.setAll(0);
-                binding.setParent(newParent);
-            });
-
-            // Add to merged set and update visuals
-            this.m_MergedMeshes.add(newParent); 
-            this.IntersectionTest(newParent);
-
-        } else {
-
-            // If this object was merged before, simply parent new intersections under this parent
-            allIntersections.forEach((tNodeInt)=>{
-                tNodeInt.setParent(tNode1);
-
-                // Draw a line to show they are bound tgt
-                const binding = MeshBuilder.CreateLines("Binding",{
-                    points: [tNode1.getChildTransformNodes()[0].getAbsolutePosition(), tNodeInt.getAbsolutePosition()],
-                }, this.m_Scene);
-                binding.isPickable = false;
-
-                // To prevent bounding box from showing
-                binding.getBoundingInfo().maximum.setAll(0);
-                binding.getBoundingInfo().minimum.setAll(0);
-                binding.setParent(tNode1);
-            });
-
-            // update visuals
-            this.IntersectionTest(tNode1);
-        }
-
-        // If Button Clicked, disable the GUI
-        this.m_UIPopup.m_MergePlane.Disable();
-    }
-
-    /**
-     * @brief Function that splits all meshes that were merged previously
-     * @returns void
-     */
-    SplitMeshes(){
-
-        // Get the highest level parent
-        const tNode1 = this.GetFirstLevelParent(this.m_MeshToMergeSplit);
-
-        // Deparent all nodes except for the binding lines
-        tNode1.getChildren().forEach((node)=>{
-            if (node.name == "Binding"){
-                // Remove the binding lines
-                node.dispose();
-            } else {
-                // Unparent the direct children
-                const child = node as TransformNode;
-                child.setParent(null);
-                this.IntersectionTest(child);
-            }
-        });
-
-        // Remove from set and throw parent away
-        this.m_MergedMeshes.delete(tNode1);
-        tNode1.dispose();
-
-        // If Button Clicked, disable the GUI
-        this.m_UIPopup.m_MergePlane.Disable();
     }
 
     /**
@@ -420,8 +246,7 @@ export class TransformWidget extends Entity{
         // Only compare with pickable and enabled meshes
         this.m_Scene.meshes.filter(
                 mesh=> mesh.isPickable && mesh.isEnabled() &&
-                mesh !== this.m_UIPopup.m_Plane.m_Mesh && 
-                mesh !== this.m_UIPopup.m_MergePlane.m_Mesh 
+                mesh !== this.m_UIPopup.m_Plane.m_Mesh
             ).forEach((mesh) => {
 
             // Loop through the child meshes and check for intersection

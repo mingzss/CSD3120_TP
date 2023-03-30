@@ -22,7 +22,6 @@ export class Tray extends Entity{
     ccounter: number;
     clcounter: number;
 
-
     m_TextPlane: TextPlane;
 
     actionManager: ActionManager;

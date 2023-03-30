@@ -33,7 +33,7 @@ export class Hydrogen extends Entity{
     Init(): void{
         // Add a Model component for the Hydrogen molecule
         this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/Hydrogen.glb";
+        this.m_Model.m_AssetPath = "assets/models/H2.glb";
         this.usingResearchTray = false;
         this.placedInBeaker = false;
 
@@ -230,51 +230,5 @@ export class Hydrogen extends Entity{
             }
           )
         );
-
-        // const beakerMesh = this._scene.getMeshById("Beaker");
-        // this.placedInBeaker = false;
-        // this.actionManager.registerAction(new ExecuteCodeAction(
-        //     {
-        //       trigger: ActionManager.OnIntersectionEnterTrigger,
-        //       parameter: {
-        //         mesh: beakerMesh,
-        //         usePreciseIntersection: false
-        //       },
-        //     },
-        //     () => {
-        //         //make model.mesh a child of beaker and snap pos
-
-        //         if (this.placedInBeaker == false) {
-        //             console.log("intersecting w beaker " + this.m_Model.m_Mesh.parent.name);
-        //             this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
-        //             let atomParent: AbstractMesh;
-        //             atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
-                    
-        //             atomParent.setParent(null);
-
-        //             var tmpWorld = this.m_ECS as TmpWorld;
-        //             tmpWorld.m_TransformWidget.m_DraggablePicked = false;
-        //             tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
-        //             console.log("setting parent");
-        //             atomParent.setParent(beakerMesh);
-        //             atomParent.position = Vector3.Random(-1, 1);
-        //             this.placedInBeaker = true;
-
-        //             var tmpWorld = this.m_ECS as TmpWorld;
-        //             for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-        //                 if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
-        //                 {
-        //                     console.log("found beaker!");
-        //                     var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
-        //                     beakerEntity.hydrogenCounter++;
-        //                     console.log(beakerEntity.hydrogenCounter + "beaker unique id: " + beakerEntity.uniqueId);
-        //                     break;
-        //                 }
-        //             }
-        //         }
-
-        //     }
-        //   )
-        // );
     }
 }

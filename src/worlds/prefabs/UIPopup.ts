@@ -19,19 +19,9 @@ export class UIPopup extends Entity{
     m_AdvancedTexture: AdvancedDynamicTexture;
 
     m_TranslateButton: Button;
-    m_ScaleButton: Button;
     m_RotateButton: Button;
 
     m_StackPanel: StackPanel;
-
-    // Merging/Splitting
-    m_MergePlane: Plane;
-    m_MergeAdvancedTexture: AdvancedDynamicTexture;
-
-    m_MergeButton: Button;
-    m_SplitButton: Button;
-
-    m_MergeStackPanel: StackPanel;
 
     m_DragState = InteractState.Translate;
 
@@ -61,22 +51,6 @@ export class UIPopup extends Entity{
         this.m_TranslateButton.onPointerClickObservable.add(() => {
             this.m_DragState = InteractState.Translate;
             this.m_TranslateButton.isEnabled = false;
-            this.m_ScaleButton.isEnabled = true;
-            this.m_RotateButton.isEnabled = true;
-        });
-
-        // Scale Button
-        this.m_ScaleButton = Button.CreateImageOnlyButton("Scale Button", "assets/textures/scale.png");
-        this.m_ScaleButton.width = "100px";
-        this.m_ScaleButton.height = "100px";
-        this.m_ScaleButton.color = "black";
-        this.m_ScaleButton.background = "white";
-        this.m_ScaleButton.isHitTestVisible = true;
-        this.m_ScaleButton.isPointerBlocker = true;
-        this.m_ScaleButton.onPointerClickObservable.add(() => {
-            this.m_DragState = InteractState.Scale;
-            this.m_TranslateButton.isEnabled = true;
-            this.m_ScaleButton.isEnabled = false;
             this.m_RotateButton.isEnabled = true;
         });
 
@@ -91,7 +65,6 @@ export class UIPopup extends Entity{
         this.m_RotateButton.onPointerClickObservable.add(() => {
             this.m_DragState = InteractState.Rotate;
             this.m_TranslateButton.isEnabled = true;
-            this.m_ScaleButton.isEnabled = true;
             this.m_RotateButton.isEnabled = false;
         });
      
@@ -103,7 +76,6 @@ export class UIPopup extends Entity{
         this.m_StackPanel.isPointerBlocker = true;
         this.m_StackPanel.addControl(this.m_TranslateButton);
         this.m_StackPanel.addControl(this.m_RotateButton);
-        this.m_StackPanel.addControl(this.m_ScaleButton);
         this.m_StackPanel.setPadding(0, 10, 0, 10);
 
         // Center the stack panel on the plane mesh
@@ -117,55 +89,6 @@ export class UIPopup extends Entity{
 
         // Start off Disabled
         this.m_Plane.Disable();
-
-
-        // Setting up the Merge/Split Plane
-        this.m_MergePlane = this.AddComponent(Plane);
-        this.m_MergePlane.m_Mesh.scaling.set(2, 1, 1);
-        this.m_MergePlane.m_Mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
-        this.m_MergePlane.m_Mesh.renderingGroupId = 2;
-        this.m_MergeAdvancedTexture = AdvancedDynamicTexture.CreateForMesh(this.m_MergePlane.m_Mesh);
-        this.m_MergeAdvancedTexture.background = "black";
-
-        // Merge Button
-        this.m_MergeButton = Button.CreateImageOnlyButton("Merge Button", "assets/textures/merge.png");
-        this.m_MergeButton.width = "100px";
-        this.m_MergeButton.height = "100px";
-        this.m_MergeButton.color = "black";
-        this.m_MergeButton.background = "white";
-        this.m_MergeButton.isHitTestVisible = true;
-        this.m_MergeButton.isPointerBlocker = true;
-
-        // Split Button
-        this.m_SplitButton = Button.CreateImageOnlyButton("Split Button", "assets/textures/split.png");
-        this.m_SplitButton.width = "100px";
-        this.m_SplitButton.height = "100px";
-        this.m_SplitButton.color = "black";
-        this.m_SplitButton.background = "white";
-        this.m_SplitButton.isHitTestVisible = true;
-        this.m_SplitButton.isPointerBlocker = true;
-
-        // Stack Panel to organize all the UI
-        this.m_MergeStackPanel = new StackPanel("UIPopup Merge Stack Panel");
-        this.m_MergeStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        this.m_MergeStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        this.m_MergeStackPanel.isVertical = false;
-        this.m_MergeStackPanel.isPointerBlocker = true;
-        this.m_MergeStackPanel.addControl(this.m_MergeButton);
-        this.m_MergeStackPanel.addControl(this.m_SplitButton);
-        this.m_MergeStackPanel.setPadding(0, 10, 0, 10);
-
-        // Center the stack panel on the plane mesh
-        this.m_MergeStackPanel.scaleX = 7.5 / this.m_MergePlane.m_Mesh.scaling.x;
-        this.m_MergeStackPanel.scaleY = 7.5 / this.m_MergePlane.m_Mesh.scaling.y;
-        this.m_MergeStackPanel.left = "0px";
-        this.m_MergeStackPanel.top = "0px";
-    
-        // Finally add to the texture
-        this.m_MergeAdvancedTexture.addControl(this.m_MergeStackPanel);
-
-        // Start off Disabled
-        this.m_MergePlane.Disable();
     }
 
     /**

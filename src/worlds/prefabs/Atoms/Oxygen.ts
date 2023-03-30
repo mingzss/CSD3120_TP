@@ -38,7 +38,7 @@ export class Oxygen extends Entity{
     */
     Init(): void{
         this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/Oxygen.glb";
+        this.m_Model.m_AssetPath = "assets/models/O2.glb";
         this.usingResearchTray = false;
         this.placedInBeaker = false;
 
