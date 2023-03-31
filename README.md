@@ -1,11 +1,11 @@
-# CSD3130-Assignment
+# CSD3120-Assignment
  
 ## Author
 Yap Ming Han
 2000490
 
 ## Brief
-This is a project done for CSD3130, which aims at providing an immersive experiences in a classroom setting.
+This is a project done for CSD3120, which aims at providing an immersive experiences in a classroom setting.
 
 I have chosen to simply target users with **Google Cardboard** to perform interactions such as:
  - Translation, Scaling, Rotation
