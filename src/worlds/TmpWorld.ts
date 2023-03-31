@@ -174,7 +174,7 @@ export class TmpWorld extends ECS{
 
             if (currSpawnName.includes("Chlorine") || currSpawnName.includes("Carbon") || 
                 currSpawnName.includes("Hydrogen") || currSpawnName.includes("Oxygen") || 
-                currSpawnName.includes("HCL") || currSpawnName.includes("CO2") || currSpawnName.includes("H2O2") ||
+                currSpawnName.includes("HCL") || currSpawnName.includes("CO2") ||
                 currSpawnName.includes("CH4") || currSpawnName.includes("H2O")) {
 
                     const onDistanceChangeObservable = new Observable<number>();
@@ -193,7 +193,10 @@ export class TmpWorld extends ECS{
                         const withinDistance = distance <= 0.6;
                         if (withinDistance) {
                             if (!this.m_hasPlayedSoundOnce) {
-                                // this.m_putOnTraySound.play();
+                                // sfx when user put things on top of tray 
+                                // issue is when user select and not move and let go, sound still plays
+                                this.m_putOnTraySound.play();
+                                // console.log("play");
                                 this.m_hasPlayedSoundOnce = true;
                             }
                         }
@@ -201,7 +204,7 @@ export class TmpWorld extends ECS{
                             this.m_hasPlayedSoundOnce = false;
                         }
                     });
-                    console.log(this.m_Interactables[this.m_Interactables.length-1].m_Name);
+                    // console.log(this.m_Interactables[this.m_Interactables.length-1].m_Name);
                 }
             this.m_hasSpawnAtoms = false;
         }
