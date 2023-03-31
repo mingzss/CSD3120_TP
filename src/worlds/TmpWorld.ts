@@ -3,7 +3,7 @@
     @brief Contains the definition of the VRWorld class, a subclass of ECS.
     It represents a customized world with objects and behavior
 */
-import { ActionManager, ExecuteCodeAction, Mesh, StandardMaterial, UniversalCamera, Vector3 } from "babylonjs";
+import { ActionManager, ExecuteCodeAction, Mesh, Observable, Sound, StandardMaterial, UniversalCamera, Vector3 } from "babylonjs";
 import { ECS, Entity, TextPlane } from "../core";
 import {
     LightSource, 
@@ -32,7 +32,12 @@ export class TmpWorld extends ECS{
     // Objects
     m_Interactables = Array<Entity>();
 
+    // if has spawns atoms/molecules
+    m_hasSpawnAtoms: Boolean = false;
     
+    m_researchTrayEntity : Entity;
+    m_putOnTraySound : Sound;
+    m_hasPlayedSoundOnce : Boolean = false;
 
     // Information Entity
     m_InfoText: InfoText;
@@ -97,7 +102,7 @@ export class TmpWorld extends ECS{
 
         this.m_Interactables.push(this.Instantiate(Sink, "Sink"));
         this.m_Interactables.push(this.Instantiate(ResearchTray, "ResearchTray"));
-
+        this.m_researchTrayEntity = this.m_Interactables[this.m_Interactables.length - 1];
 
         this.m_XRPromise.then(() => {
             this.m_ControllerDragFeature.Enable();
@@ -131,6 +136,8 @@ export class TmpWorld extends ECS{
         this.getBoundingBoxRenderer().frontColor.set(1, 0, 0);
         this.getBoundingBoxRenderer().backColor.set(1, 0, 0);
 
+        this.m_putOnTraySound = new Sound("putOntoTray", "assets/sounds/putOntoTray.wav", this.m_researchTrayEntity.m_Scene);
+
         // For Debugging:
         // window.addEventListener("keydown", e => {
         //     if (e.key === "t"){
@@ -147,6 +154,46 @@ export class TmpWorld extends ECS{
             entity.Update();
         })
 
+        if (this.m_hasSpawnAtoms) {
+            // gets last spawned object
+            let currEntity = this.m_Interactables[this.m_Interactables.length-1];
+            let currSpawnName = currEntity.m_Name;
+
+            if (currSpawnName.includes("Chlorine") || currSpawnName.includes("Carbon") || 
+                currSpawnName.includes("Hydrogen") || currSpawnName.includes("Oxygen") || 
+                currSpawnName.includes("HCL") || currSpawnName.includes("CO2") || currSpawnName.includes("H2O2") ||
+                currSpawnName.includes("CH4") || currSpawnName.includes("H2O")) {
+
+                    const onDistanceChangeObservable = new Observable<number>();
+                    let previousState: number = null;
+                    this.onBeforeRenderObservable.add(() => {
+                        const currentState = Vector3.Distance(currEntity.position,
+                            this.m_researchTrayEntity.position);
+                        if (currentState !== previousState) {
+                            previousState = currentState;
+                            onDistanceChangeObservable.notifyObservers(currentState);
+                        }
+                    });
+                    currEntity.distanceDifferenceObservable = onDistanceChangeObservable;
+
+                    const ob = currEntity.distanceDifferenceObservable.add(distance => {
+                        const withinDistance = distance <= 0.6;
+                        if (withinDistance) {
+                            if (!this.m_hasPlayedSoundOnce) {
+                                // this.m_putOnTraySound.play();
+                                this.m_hasPlayedSoundOnce = true;
+                            }
+                        }
+                        else {
+                            this.m_hasPlayedSoundOnce = false;
+                        }
+                    });
+                    console.log(this.m_Interactables[this.m_Interactables.length-1].m_Name);
+                }
+            this.m_hasSpawnAtoms = false;
+        }
+
+        
         this.m_TransformWidget.Update();
         
     }
