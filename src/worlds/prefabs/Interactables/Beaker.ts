@@ -7,6 +7,7 @@ import { Entity, Model } from "../../../core"
 import { TmpWorld } from "../../TmpWorld";
 import { CH4 } from "../Molecules/CH4";
 import { CO2 } from "../Molecules/CO2";
+import { H2CO3 } from "../Molecules/H2CO3";
 import { H2O } from "../Molecules/H2O";
 import { HCL } from "../Molecules/HCL";
 
@@ -33,10 +34,12 @@ export class Beaker extends Entity {
     ch4Counter: number;
     co2Counter: number;
     hclCounter: number;
+    h2co3Counter: number;
 
     shakecounter: number;
     reacted: boolean;
     kaboomSound: Sound;
+    dingSound: Sound;
     playedKaboom: boolean;
     kaboomParticleSystem: ParticleSystem;
     /**
@@ -56,11 +59,13 @@ export class Beaker extends Entity {
         this.ch4Counter = 0;
         this.co2Counter = 0;
         this.hclCounter = 0;
+        this.h2co3Counter = 0;
 
         this.shakecounter = 0;
         this.reacted = false;
         this.playedKaboom = false;
         this.kaboomSound = new Sound("kaboom", "assets/sounds/Explosion.wav", this.m_Scene, null, { loop: false, autoplay: false });
+        this.dingSound = new Sound("ding", "assets/sounds/ding.wav", this.m_Scene, null, { loop: false, autoplay: false });
         // Load the Beaker model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(() => {
@@ -119,7 +124,9 @@ export class Beaker extends Entity {
             if (this.hydrogenCounter === 2 && this.oxygenCounter === 1 &&
                 this.chlorineCounter == 0 && this.carbonCounter == 0 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
-                this.co2Counter == 0 ) { //H2O
+                this.co2Counter == 0 && this.h2co3Counter == 0) { //H2O
+                this.dingSound.play(0, 0, 1);
+
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
                     if (tmpWorld.m_Interactables[i].m_Name == this.name) {
                         tmpWorld.m_Interactables.splice(i, 1);
@@ -153,7 +160,9 @@ export class Beaker extends Entity {
             else if (this.hydrogenCounter === 2 && this.oxygenCounter === 0 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
                 this.carbonCounter == 1 && this.chlorineCounter == 0 &&
-                this.co2Counter == 0) { //CH4
+                this.co2Counter == 0 && this.h2co3Counter == 0) { //CH4
+                this.dingSound.play(0, 0, 1);
+
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
                     if (tmpWorld.m_Interactables[i].m_Name == this.name) {
                         tmpWorld.m_Interactables.splice(i, 1);
@@ -181,7 +190,9 @@ export class Beaker extends Entity {
             else if (this.hydrogenCounter === 0 && this.oxygenCounter === 1 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
                 this.carbonCounter == 1 && this.chlorineCounter == 0 &&
-                this.co2Counter == 0) { //CO2
+                this.co2Counter == 0 && this.h2co3Counter == 0) { //CO2
+                this.dingSound.play(0, 0, 1);
+
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
                     if (tmpWorld.m_Interactables[i].m_Name == this.name) {
                         tmpWorld.m_Interactables.splice(i, 1);
@@ -209,7 +220,9 @@ export class Beaker extends Entity {
             else if (this.hydrogenCounter === 1 && this.oxygenCounter === 0 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
                 this.carbonCounter == 0 && this.chlorineCounter == 1 &&
-                this.co2Counter == 0) { //CO2
+                this.co2Counter == 0 && this.h2co3Counter == 0) { //CO2
+                this.dingSound.play(0, 0, 1);
+
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
                     if (tmpWorld.m_Interactables[i].m_Name == this.name) {
                         tmpWorld.m_Interactables.splice(i, 1);
@@ -236,6 +249,71 @@ export class Beaker extends Entity {
                         tmpWorld.m_Interactables.push(hclEntity);
                         tmpWorld.m_Interactables.push(hclEntity2);
 
+                        return;
+                    });
+                });
+            }
+            else if (this.hydrogenCounter === 0 && this.oxygenCounter === 0 &&
+                this.h2oCounter == 1 && this.ch4Counter == 0 &&
+                this.carbonCounter == 0 && this.chlorineCounter == 0 &&
+                this.co2Counter == 1 && this.h2co3Counter == 0) { //H2CO3
+                this.dingSound.play(0, 0, 1);
+
+                for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+                    if (tmpWorld.m_Interactables[i].m_Name == this.name) {
+                        tmpWorld.m_Interactables.splice(i, 1);
+                        break;
+                    }
+                }
+
+                var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
+                newBeakerEntity.position.set(2, 7, 5.6);
+                tmpWorld.m_Interactables.push(newBeakerEntity);
+
+                this.m_Model.m_Mesh.dispose();
+                this.dispose();
+
+                newBeakerEntity.m_Promise.then(() => {
+                    var h2co3Name = "HCL Molecule " + tmpWorld.h2co3Counter.toString();
+                    var h2co3Entity = tmpWorld.Instantiate(H2CO3, h2co3Name);
+                    tmpWorld.h2co3Counter++;
+                    h2co3Entity.m_Promise.then(() => {
+                        console.log("HCL Promise: " + this.name);
+                        tmpWorld.m_Interactables.push(h2co3Entity);
+                        return;
+                    });
+                });
+            }
+            else if (this.hydrogenCounter === 0 && this.oxygenCounter === 0 &&
+                this.h2oCounter == 0 && this.ch4Counter == 0 &&
+                this.carbonCounter == 0 && this.chlorineCounter == 0 &&
+                this.co2Counter == 0 && this.h2co3Counter == 1) { //H2O + CO2
+                this.dingSound.play(0, 0, 1);
+
+                for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+                    if (tmpWorld.m_Interactables[i].m_Name == this.name) {
+                        tmpWorld.m_Interactables.splice(i, 1);
+                        break;
+                    }
+                }
+
+                var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
+                newBeakerEntity.position.set(2, 7, 5.6);
+                tmpWorld.m_Interactables.push(newBeakerEntity);
+
+                this.m_Model.m_Mesh.dispose();
+                this.dispose();
+
+                newBeakerEntity.m_Promise.then(() => {
+                    var h2oName = "H2O Molecule " + tmpWorld.h2oCounter.toString();
+                    var h2oEntity = tmpWorld.Instantiate(H2O, h2oName);
+                    tmpWorld.h2oCounter++;
+                    var co2Name = "CO2 Molecule " + tmpWorld.co2Counter.toString();
+                    var co2Entity = tmpWorld.Instantiate(CO2, co2Name);
+                    tmpWorld.co2Counter++;
+                    Promise.all([h2oEntity.m_Promise, co2Entity.m_Promise]).then(() => {
+                        tmpWorld.m_Interactables.push(h2oEntity);
+                        tmpWorld.m_Interactables.push(co2Entity);
                         return;
                     });
                 });
