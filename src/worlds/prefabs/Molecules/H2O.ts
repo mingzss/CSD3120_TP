@@ -43,7 +43,7 @@ export class H2O extends Entity{
     this.m_H2OModelEntity.position.set(0, 0.05, 0);
     const beaker = (this.m_ECS as TmpWorld).m_Beaker;
     var tmp = beaker.m_Rigidbody.m_Mesh;
-    this.position.set(tmp.absolutePosition._x, tmp.absolutePosition._y, 1.5 + tmp.absolutePosition._z);
+    this.position.set(tmp.position._x, tmp.position._y, -2.5 + tmp.position._z);
 
     this.m_TextPlane = this.AddComponent(TextPlane);
     this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI / 2, 0);
@@ -81,7 +81,7 @@ export class H2O extends Entity{
         tmpWorld.m_TransformWidget.m_DraggablePicked = false;
         tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
         console.log("setting parent");
-        atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+        atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
         atomParent.position = Vector3.Random(-1, 1);
         this.placedInBeaker = true;
         var tmpWorld = this.m_ECS as TmpWorld;

@@ -40,7 +40,7 @@ export class Beaker extends Entity{
     createParticles(filepath: string) {
         const particleSystem = new ParticleSystem("particleSystem", 5000, this.m_Scene);
         particleSystem.particleTexture = new Texture(filepath, this.m_Scene);
-        particleSystem.emitter = this.getAbsolutePosition();
+        particleSystem.emitter = this.m_Rigidbody.m_Mesh.position;
         particleSystem.minEmitBox = new Vector3(0, 0, 0);
         particleSystem.color1 = new Color4(1, 1, 1, 1);
         particleSystem.color2 = new Color4(1, 1, 1, 0);
@@ -91,10 +91,10 @@ export class Beaker extends Entity{
         const impostor = new PhysicsImpostor(
             this.m_Rigidbody.m_Mesh,
             PhysicsImpostor.BoxImpostor,
-            { mass: 1, restitution: 0.2, friction: 0.2 },
+            { mass: 1, restitution: -0.1 },
             this.m_Scene
           );
-          this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
+        this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
         this.m_Rigidbody.m_Mesh.setParent(this);
 
         this.actionManager = this.m_Rigidbody.m_Mesh.actionManager = new ActionManager(this.m_Scene);
@@ -165,7 +165,7 @@ export class Beaker extends Entity{
                     }
                 }
                 var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
-                newBeakerEntity.position.set(2, 7, 5.6);
+                newBeakerEntity.position.set(0,0.1,0);
                 tmpWorld.m_Interactables.push(newBeakerEntity);
                 (this.m_ECS as TmpWorld).m_Beaker = newBeakerEntity;
 
@@ -174,14 +174,16 @@ export class Beaker extends Entity{
                 this.Destroy();
                 this.m_BeakerModelEntity.Destroy();
 
-                var hName = "H2O Molecule " + tmpWorld.h2oCounter.toString();
-                var h2oEntity = tmpWorld.Instantiate(H2O, hName);
-                tmpWorld.h2oCounter++;
-                var hName2 = "H2O Molecule " + tmpWorld.h2oCounter.toString();
-                var h2oEntity2 = tmpWorld.Instantiate(H2O, hName2);
-                tmpWorld.h2oCounter++;
-                tmpWorld.m_Interactables.push(h2oEntity);
-                tmpWorld.m_Interactables.push(h2oEntity2);
+                newBeakerEntity.m_BeakerModelEntity.m_Promise.then(() => {
+                    var hName = "H2O Molecule " + tmpWorld.h2oCounter.toString();
+                    var h2oEntity = tmpWorld.Instantiate(H2O, hName);
+                    tmpWorld.h2oCounter++;
+                    var hName2 = "H2O Molecule " + tmpWorld.h2oCounter.toString();
+                    var h2oEntity2 = tmpWorld.Instantiate(H2O, hName2);
+                    tmpWorld.h2oCounter++;
+                    tmpWorld.m_Interactables.push(h2oEntity);
+                    tmpWorld.m_Interactables.push(h2oEntity2);
+                });
             }
             else if (this.hydrogenCounter === 2 && this.oxygenCounter === 0 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
@@ -197,7 +199,7 @@ export class Beaker extends Entity{
                 }
 
                 var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
-                newBeakerEntity.position.set(2, 7, 5.6);
+                newBeakerEntity.position.set(0,0.1,0);
                 tmpWorld.m_Interactables.push(newBeakerEntity);
                 (this.m_ECS as TmpWorld).m_Beaker = newBeakerEntity;
 
@@ -205,11 +207,12 @@ export class Beaker extends Entity{
                 this.m_Rigidbody.m_Mesh.dispose();
                 this.Destroy();
                 this.m_BeakerModelEntity.Destroy();
-
-                var ch4Name = "CH4 Molecule " + tmpWorld.ch4Counter.toString();
-                var ch4Entity = tmpWorld.Instantiate(CH4, ch4Name);
-                tmpWorld.ch4Counter++;
-                tmpWorld.m_Interactables.push(ch4Entity);
+                newBeakerEntity.m_BeakerModelEntity.m_Promise.then(() => {
+                    var ch4Name = "CH4 Molecule " + tmpWorld.ch4Counter.toString();
+                    var ch4Entity = tmpWorld.Instantiate(CH4, ch4Name);
+                    tmpWorld.ch4Counter++;
+                    tmpWorld.m_Interactables.push(ch4Entity);
+                });
             }
             else if (this.hydrogenCounter === 0 && this.oxygenCounter === 1 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
@@ -225,7 +228,7 @@ export class Beaker extends Entity{
                 }
 
                 var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
-                newBeakerEntity.position.set(2, 7, 5.6);
+                newBeakerEntity.position.set(0,0.1,0);
                 tmpWorld.m_Interactables.push(newBeakerEntity);
                 (this.m_ECS as TmpWorld).m_Beaker = newBeakerEntity;
 
@@ -234,10 +237,12 @@ export class Beaker extends Entity{
                 this.Destroy();
                 this.m_BeakerModelEntity.Destroy();
 
-                var co2Name = "CO2 Molecule " + tmpWorld.co2Counter.toString();
-                var co2Entity = tmpWorld.Instantiate(CO2, co2Name);
-                tmpWorld.co2Counter++;
-                tmpWorld.m_Interactables.push(co2Entity);
+                newBeakerEntity.m_BeakerModelEntity.m_Promise.then(() => {
+                    var co2Name = "CO2 Molecule " + tmpWorld.co2Counter.toString();
+                    var co2Entity = tmpWorld.Instantiate(CO2, co2Name);
+                    tmpWorld.co2Counter++;
+                    tmpWorld.m_Interactables.push(co2Entity);
+                });
             }
             else if (this.hydrogenCounter === 1 && this.oxygenCounter === 0 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
@@ -253,7 +258,7 @@ export class Beaker extends Entity{
                 }
 
                 var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
-                newBeakerEntity.position.set(2, 7, 5.6);
+                newBeakerEntity.position.set(0, 0.1, 0);
                 tmpWorld.m_Interactables.push(newBeakerEntity);
                 (this.m_ECS as TmpWorld).m_Beaker = newBeakerEntity;
 
@@ -262,14 +267,16 @@ export class Beaker extends Entity{
                 this.Destroy();
                 this.m_BeakerModelEntity.Destroy();
 
-                var hclName = "HCL Molecule " + tmpWorld.hclCounter.toString();
-                var hclEntity = tmpWorld.Instantiate(HCL, hclName);
-                tmpWorld.hclCounter++;
-                var hclName2 = "HCL Molecule " + tmpWorld.hclCounter.toString();
-                var hclEntity2 = tmpWorld.Instantiate(HCL, hclName2);
-                tmpWorld.hclCounter++;
-                tmpWorld.m_Interactables.push(hclEntity);
-                tmpWorld.m_Interactables.push(hclEntity2);
+                newBeakerEntity.m_BeakerModelEntity.m_Promise.then(() => {
+                    var hclName = "HCL Molecule " + tmpWorld.hclCounter.toString();
+                    var hclEntity = tmpWorld.Instantiate(HCL, hclName);
+                    tmpWorld.hclCounter++;
+                    var hclName2 = "HCL Molecule " + tmpWorld.hclCounter.toString();
+                    var hclEntity2 = tmpWorld.Instantiate(HCL, hclName2);
+                    tmpWorld.hclCounter++;
+                    tmpWorld.m_Interactables.push(hclEntity);
+                    tmpWorld.m_Interactables.push(hclEntity2);
+                });
             }
             else if (this.hydrogenCounter === 0 && this.oxygenCounter === 0 &&
                 this.h2oCounter == 1 && this.ch4Counter == 0 &&
@@ -285,7 +292,7 @@ export class Beaker extends Entity{
                 }
 
                 var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
-                newBeakerEntity.position.set(2, 7, 5.6);
+                newBeakerEntity.position.set(0,0.1,0);
                 tmpWorld.m_Interactables.push(newBeakerEntity);
                 (this.m_ECS as TmpWorld).m_Beaker = newBeakerEntity;
 
@@ -294,10 +301,12 @@ export class Beaker extends Entity{
                 this.Destroy();
                 this.m_BeakerModelEntity.Destroy();
 
-                var h2co3Name = "H2CO3 Molecule " + tmpWorld.h2co3Counter.toString();
-                var h2co3Entity = tmpWorld.Instantiate(H2CO3, h2co3Name);
-                tmpWorld.h2co3Counter++;
-                tmpWorld.m_Interactables.push(h2co3Entity);
+                newBeakerEntity.m_BeakerModelEntity.m_Promise.then(() => {
+                    var h2co3Name = "H2CO3 Molecule " + tmpWorld.h2co3Counter.toString();
+                    var h2co3Entity = tmpWorld.Instantiate(H2CO3, h2co3Name);
+                    tmpWorld.h2co3Counter++;
+                    tmpWorld.m_Interactables.push(h2co3Entity);
+                });
             }
             else if (this.hydrogenCounter === 0 && this.oxygenCounter === 0 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&
@@ -313,7 +322,7 @@ export class Beaker extends Entity{
                 }
 
                 var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
-                newBeakerEntity.position.set(2, 7, 5.6);
+                newBeakerEntity.position.set(0,0.1,0);
                 tmpWorld.m_Interactables.push(newBeakerEntity);
                 (this.m_ECS as TmpWorld).m_Beaker = newBeakerEntity;
 
@@ -321,15 +330,16 @@ export class Beaker extends Entity{
                 this.m_Rigidbody.m_Mesh.dispose();
                 this.Destroy();
                 this.m_BeakerModelEntity.Destroy();
-
-                var h2oName = "H2O Molecule " + tmpWorld.h2oCounter.toString();
-                var h2oEntity = tmpWorld.Instantiate(H2O, h2oName);
-                tmpWorld.h2oCounter++;
-                var co2Name = "CO2 Molecule " + tmpWorld.co2Counter.toString();
-                var co2Entity = tmpWorld.Instantiate(CO2, co2Name);
-                tmpWorld.co2Counter++;
-                tmpWorld.m_Interactables.push(h2oEntity);
-                tmpWorld.m_Interactables.push(co2Entity);
+                newBeakerEntity.m_BeakerModelEntity.m_Promise.then(() => {
+                    var h2oName = "H2O Molecule " + tmpWorld.h2oCounter.toString();
+                    var h2oEntity = tmpWorld.Instantiate(H2O, h2oName);
+                    tmpWorld.h2oCounter++;
+                    var co2Name = "CO2 Molecule " + tmpWorld.co2Counter.toString();
+                    var co2Entity = tmpWorld.Instantiate(CO2, co2Name);
+                    tmpWorld.co2Counter++;
+                    tmpWorld.m_Interactables.push(h2oEntity);
+                    tmpWorld.m_Interactables.push(co2Entity);
+                });
             }
             else {
                 //kaboom sound + particles + fade beaker
@@ -356,7 +366,7 @@ export class Beaker extends Entity{
                         }
                     }
                     var newBeakerEntity = tmpWorld.Instantiate(Beaker, "Beaker");
-                    newBeakerEntity.position.set(2, 7, 5.6);
+                    newBeakerEntity.position.set(0,0.1,0);
                     tmpWorld.m_Interactables.push(newBeakerEntity);
                     (this.m_ECS as TmpWorld).m_Beaker = newBeakerEntity;
 

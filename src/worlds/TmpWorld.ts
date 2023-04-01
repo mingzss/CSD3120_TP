@@ -206,7 +206,7 @@ export class TmpWorld extends ECS{
                                 // sfx when user put things on top of tray 
                                 // issue is when user select and not move and let go, sound still plays
                                 this.m_putOnTraySound.play();
-                                // console.log("play");
+                                console.log("play");
                                 this.m_hasPlayedSoundOnce = true;
                             }
                         }

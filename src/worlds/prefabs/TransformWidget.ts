@@ -122,6 +122,7 @@ export class TransformWidget extends Entity{
                         this.m_DraggedMesh = pickResult.pickedMesh;
                         if (this.m_DraggedMesh.physicsImpostor != null){
                             this.m_DragObjectMass = this.m_DraggedMesh.physicsImpostor.mass;
+                            console.log(this.m_DraggedMesh.physicsImpostor.mass);
                             this.m_DraggedMesh.physicsImpostor.setMass(0);
                         }
                         this.m_InitialPickedPoint = pickResult.pickedPoint;

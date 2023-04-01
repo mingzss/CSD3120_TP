@@ -76,15 +76,13 @@ export class Chlorine extends Entity{
         atomParent.setParent(null);
         this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
         this.m_Rigidbody.m_Mesh.position.setAll(0);
-        //atomParent.position = beakerMesh.position;
         var tmpWorld = this.m_ECS as TmpWorld;
         tmpWorld.m_TransformWidget.m_DraggablePicked = false;
         tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
         console.log("setting parent");
-        atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+        atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
         atomParent.position = Vector3.Random(-1, 1);
         this.placedInBeaker = true;
-        //this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
         var tmpWorld = this.m_ECS as TmpWorld;
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
             if (tmpWorld.m_Interactables[i].m_Name === "Beaker")

@@ -82,7 +82,7 @@ export class Oxygen extends Entity{
                 tmpWorld.m_TransformWidget.m_DraggablePicked = false;
                 tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
                 console.log("setting parent");
-                atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+                atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
                 atomParent.position = Vector3.Random(-1, 1);
                 this.placedInBeaker = true;
                 //this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
