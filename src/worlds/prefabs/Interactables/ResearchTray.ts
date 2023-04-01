@@ -2,8 +2,8 @@
     @file ResearchTray.ts
     @brief Class representing an entity that loads and displays a 3D model of ResearchTray.
 */
-import { ActionManager, ExecuteCodeAction, StandardMaterial } from "babylonjs";
-import {Entity, Model, TextPlane} from "../../../core"
+import { ActionManager, ExecuteCodeAction, ISceneLoaderAsyncResult, PhysicsImpostor, StandardMaterial } from "babylonjs";
+import {Cube, Entity, Model, TextPlane} from "../../../core"
 
 export class ResearchTray extends Entity{
 
@@ -21,7 +21,7 @@ export class ResearchTray extends Entity{
     /**
      * @brief A promise for loading the ResearchTray model.
      */
-    m_Promise: Promise<void>
+    m_Promise: Promise<ISceneLoaderAsyncResult>
 
     /**
      * @brief Initializes the entity by loading and displaying the ResearchTray model.
@@ -43,7 +43,21 @@ export class ResearchTray extends Entity{
             this.getChildMeshes().forEach((mesh)=>{
                 mesh.isPickable = false;
             })
-        })
+        });
+
+        const rigidbody = this.AddComponent(Cube);
+        rigidbody.m_Mesh.isPickable = false;
+        rigidbody.m_Mesh.setParent(null);
+        rigidbody.m_Mesh.scaling.set(2, 0.1, 1.5);
+        rigidbody.m_Mesh.visibility = 0;
+        const impostor = new PhysicsImpostor(
+            rigidbody.m_Mesh,
+            PhysicsImpostor.BoxImpostor,
+            { mass: 0, restitution: 0.2, friction: 0.2 },
+            this.m_Scene
+          );
+        rigidbody.m_Mesh.physicsImpostor = impostor;
+        rigidbody.m_Mesh.setParent(this);
 
         this.m_TextPlane = this.AddComponent(TextPlane);
         this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);

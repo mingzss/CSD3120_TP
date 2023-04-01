@@ -105,15 +105,4 @@ export abstract class Entity extends TransformNode {
     this.CleanUp();
     this.m_ECS.Destroy(this);
   }
-
-  /**
-   * @brief Disposes of the entity and its children.
-   * @details Calls the Destroy method on each child entity and then calls the dispose method of the parent.
-   */
-  dispose(doNotRecurse?: boolean, disposeMaterialAndTextures?: boolean): void {
-    for (const child of this.getChildren()) {
-      (child as Entity).Destroy();
-    }
-    super.dispose(true, true);
-  }
 }

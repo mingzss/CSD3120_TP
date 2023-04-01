@@ -2,6 +2,7 @@
     @file Sink.ts
     @brief Class representing an entity that loads and displays a 3D model of Sink.
 */
+import { ISceneLoaderAsyncResult } from "babylonjs";
 import {Entity, Model} from "../../../core"
 
 export class Sink extends Entity{
@@ -15,7 +16,7 @@ export class Sink extends Entity{
     /**
      * @brief A promise for loading the Sink model.
      */
-    m_Promise: Promise<void>
+    m_Promise: Promise<ISceneLoaderAsyncResult>
 
     /**
      * @brief Initializes the entity by loading and displaying the Sink model.

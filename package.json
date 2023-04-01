@@ -1,11 +1,15 @@
 {
   "dependencies": {
+    "@babylonjs/core": "^5.53.0",
+    "@babylonjs/loaders": "^5.53.0",
     "babylonjs": "^5.52.0",
     "babylonjs-gui": "^5.52.0",
     "babylonjs-loaders": "^5.52.0",
+    "cannon": "^0.6.2",
     "node-polyfill-webpack-plugin": "^2.0.1"
   },
   "devDependencies": {
+    "@types/cannon": "^0.1.8",
     "@types/node": "^18.15.7",
     "copy-webpack-plugin": "^11.0.0",
     "html-webpack-plugin": "^5.5.0",

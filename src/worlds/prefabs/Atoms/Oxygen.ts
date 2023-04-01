@@ -2,24 +2,13 @@
     @file Oxygen.ts
     @brief Contains the Oxygen class implementation.
 */
-import { AbstractMesh, ActionManager, ExecuteCodeAction, SixDofDragBehavior, StandardMaterial, Vector3, } from "babylonjs";
-import {Entity, Model, TextPlane} from "../../../core"
+import { AbstractMesh, ActionManager, ExecuteCodeAction, ISceneLoaderAsyncResult, PhysicsImpostor, SixDofDragBehavior, StandardMaterial, Vector3, } from "babylonjs";
+import {Cube, Entity, Model, TextPlane} from "../../../core"
 import { TmpWorld } from "../../TmpWorld";
 import { Beaker } from "../Interactables/Beaker";
 import { ResearchTray } from "../Interactables/ResearchTray";
 
-/**
-    @class O2
-    @brief A class that represents an O2 entity.
-    @extends Entity
-*/
 export class Oxygen extends Entity{
-
-    /**
-        @brief The model associated with the Oxygen entity.
-    */
-    m_Model: Model;
-
     m_TextPlane: TextPlane;
 
     usingResearchTray: boolean;
@@ -27,75 +16,73 @@ export class Oxygen extends Entity{
     actionManager: ActionManager;
 
     placedInBeaker: boolean;
-    //sixDofDragBehavior: SixDofDragBehavior;
-    /**
-        @brief A promise representing the loading of the Oxygen atom.
-    */
-    m_Promise: Promise<void>
 
-    /**
-        @brief Initializes the Oxygen entity by setting up its model.
-    */
-    Init(): void{
-        this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/O2.glb";
+    m_Rigidbody: Cube;
+    m_OxygenModelEntity: OxygenModel;
+  
+    Init(): void {
         this.usingResearchTray = false;
         this.placedInBeaker = false;
 
-        this.m_Promise = this.m_Model.LoadModel();
-        this.m_Promise.then(()=>{
-            var tmp = this.m_Scene.getTransformNodeById("Oxygen");
-            this.position.set(tmp.absolutePosition._x, 0.15 + tmp.absolutePosition._y, tmp.absolutePosition._z);
-            this.scaling.setAll(0.5);
-            this.m_Model.m_Mesh.name = this.name + " Mesh";
-            this.m_Model.m_Mesh.id = this.name + " Mesh";
-            this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
-            this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
-            
-            this.m_TextPlane = this.AddComponent(TextPlane);
-            this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);
-            this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
-            this.m_TextPlane.m_GUITexture.background = "purple";
-            this.m_TextPlane.m_TextBlock.color = "white";
-            this.m_TextPlane.m_Mesh.scaling.setAll(1);
-            this.m_TextPlane.m_TextBlock.fontSize = 10;
-            this.m_TextPlane.m_TextBlock.textWrapping = true;
-            this.m_TextPlane.m_Mesh.isPickable = false;
-            this.m_TextPlane.m_TextBlock.text = this.m_Name + "(O)";
-            (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
-            
-            this.actionManager = this.m_Scene.getLastMeshById(this.name + " Mesh").actionManager = new ActionManager(this.m_Scene);
-            this.m_TextPlane.m_Mesh.isVisible = false;
-            //this.sixDofDragBehavior = new SixDofDragBehavior();
-            //this.m_Model.m_Entity.addBehavior(this.sixDofDragBehavior);
-            this.InitAction();
-        })
+        this.m_Rigidbody = this.AddComponent(Cube);
+        this.m_Rigidbody.m_Mesh.setParent(null);
+        this.m_Rigidbody.m_Mesh.scaling.set(0.75, 0.4, 0.4);
+        this.m_Rigidbody.m_Mesh.visibility = 0;
+          const impostor = new PhysicsImpostor(
+            this.m_Rigidbody.m_Mesh,
+            PhysicsImpostor.BoxImpostor,
+            { mass: 1, restitution: 0.2, friction: 0.2 },
+            this.m_Scene
+            );
+        this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
+        this.m_Rigidbody.m_Mesh.setParent(this);
+
+        this.m_OxygenModelEntity = this.m_ECS.Instantiate(OxygenModel, "Oxygen Model");
+        this.m_OxygenModelEntity.scaling.setAll(0.5);
+        this.m_OxygenModelEntity.setParent(this.m_Rigidbody.m_Mesh);
+        var tmp = this.m_Scene.getTransformNodeById("Oxygen");
+        this.position.set(tmp.absolutePosition._x, 0.15 + tmp.absolutePosition._y, tmp.absolutePosition._z);
+        
+        this.m_TextPlane = this.AddComponent(TextPlane);
+        this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);
+        this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
+        this.m_TextPlane.m_GUITexture.background = "purple";
+        this.m_TextPlane.m_TextBlock.color = "white";
+        this.m_TextPlane.m_Mesh.scaling.setAll(1);
+        this.m_TextPlane.m_TextBlock.fontSize = 10;
+        this.m_TextPlane.m_TextBlock.textWrapping = true;
+        this.m_TextPlane.m_Mesh.isPickable = false;
+        this.m_TextPlane.m_TextBlock.text = this.m_Name + "(O)";
+        (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
+        this.m_TextPlane.m_Mesh.setParent(this.m_Rigidbody.m_Mesh);
+
+        this.actionManager = this.m_Rigidbody.m_Mesh.actionManager = new ActionManager(this.m_Scene);
+        this.m_TextPlane.m_Mesh.isVisible = false;
+        //this.sixDofDragBehavior = new SixDofDragBehavior();
+        //this.m_Model.m_Entity.addBehavior(this.sixDofDragBehavior);
+        this.InitAction();
     }
 
-    /**
-        @brief The update function of the O2 entity.
-    */
     Update(): void {
-        // Empty for now.
-        this.m_Promise.then(()=>{
-            const beakerMesh = this._scene.getMeshById("Beaker");
-            const currMesh = this.m_Scene.getLastMeshById(this.name + " Mesh");
-            if (beakerMesh === null || currMesh === null) return;
-            if (beakerMesh.intersectsMesh(currMesh))
-            {
-              if (this.placedInBeaker == false) {
-                console.log("intersecting w beaker " + this.m_Model.m_Mesh.parent.name);
+        const beaker = (this.m_ECS as TmpWorld).m_Beaker;
+        if (beaker === null) return;
+        if (beaker.m_Rigidbody.m_Mesh.intersectsMesh(this.m_Rigidbody.m_Mesh))
+        {
+            if (this.placedInBeaker == false) {
+                console.log("intersecting w beaker " + this.m_Rigidbody.m_Mesh.parent.name);
                 this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
                 let atomParent: AbstractMesh;
-                atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
+                atomParent = this.m_Rigidbody.m_Mesh.parent as AbstractMesh;
                 
                 atomParent.setParent(null);
+                this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+                this.m_Rigidbody.m_Mesh.position.setAll(0);
                 //atomParent.position = beakerMesh.position;
                 var tmpWorld = this.m_ECS as TmpWorld;
                 tmpWorld.m_TransformWidget.m_DraggablePicked = false;
                 tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
                 console.log("setting parent");
-                atomParent.setParent(beakerMesh);
+                atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
                 atomParent.position = Vector3.Random(-1, 1);
                 this.placedInBeaker = true;
                 //this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
@@ -110,10 +97,10 @@ export class Oxygen extends Entity{
                     }
                 }
             }
-            }
-          });
+        }
     }
 
+    
     public SetLabelVisibility(isVisible : boolean){
 
     }
@@ -210,15 +197,18 @@ export class Oxygen extends Entity{
               },
             },
             () => {
-                if (this.parent.name === "Beaker") return;
+                if (this.parent?.parent?.name === "Beaker") return;
                 var tmpWorld = this.m_ECS as TmpWorld
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                     if (tmpWorld.m_Interactables[i].m_Name == this.name)
                         tmpWorld.m_Interactables.splice(i, 1);
                 }
-                this.m_Model.m_Mesh.dispose();
+                this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+                this.m_Rigidbody.m_Mesh.dispose();
+                this.m_OxygenModelEntity.m_Model.m_Mesh.dispose();
                 this.m_TextPlane.m_Mesh.dispose();
-                this.dispose();
+                this.Destroy();
+                this.m_OxygenModelEntity.Destroy();
             }
           )
         );
@@ -232,15 +222,18 @@ export class Oxygen extends Entity{
               },
             },
             () => {
-                if (this.parent.name === "Beaker") return;
+                if (this.parent?.parent?.name === "Beaker") return;
                 var tmpWorld = this.m_ECS as TmpWorld
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                     if (tmpWorld.m_Interactables[i].m_Name == this.name)
                         tmpWorld.m_Interactables.splice(i, 1);
                 }
-                this.m_Model.m_Mesh.dispose();
+                this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+                this.m_Rigidbody.m_Mesh.dispose();
+                this.m_OxygenModelEntity.m_Model.m_Mesh.dispose();
                 this.m_TextPlane.m_Mesh.dispose();
-                this.dispose();
+                this.Destroy();
+                this.m_OxygenModelEntity.Destroy();
             }
           )
         );
@@ -288,4 +281,47 @@ export class Oxygen extends Entity{
         //   )
         // );
     }
+}
+
+/**
+    @class O2
+    @brief A class that represents an O2 entity.
+    @extends Entity
+*/
+export class OxygenModel extends Entity{
+
+    /**
+        @brief The model associated with the Oxygen entity.
+    */
+    m_Model: Model;
+
+    //sixDofDragBehavior: SixDofDragBehavior;
+    /**
+        @brief A promise representing the loading of the Oxygen atom.
+    */
+    m_Promise: Promise<ISceneLoaderAsyncResult>
+
+    /**
+        @brief Initializes the Oxygen entity by setting up its model.
+    */
+    Init(): void{
+        this.m_Model = this.AddComponent(Model);
+        this.m_Model.m_AssetPath = "assets/models/O2.glb";
+
+        this.m_Promise = this.m_Model.LoadModel();
+        this.m_Promise.then(()=>{
+            this.m_Model.m_Mesh.name = this.name + " Mesh";
+            this.m_Model.m_Mesh.id = this.name + " Mesh";
+            this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
+            this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
+        })
+    }
+
+    /**
+        @brief The update function of the O2 entity.
+    */
+    Update(): void {
+
+    }
+
 }

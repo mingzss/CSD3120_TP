@@ -2,7 +2,7 @@
     @file O2.ts
     @brief Contains the O2 class implementation.
 */
-import { StandardMaterial, Texture } from "babylonjs";
+import { ISceneLoaderAsyncResult, StandardMaterial, Texture } from "babylonjs";
 import {Entity, Model, Sphere} from "../../core"
 
 /**
@@ -20,7 +20,7 @@ export class O2 extends Entity{
     /**
         @brief A promise representing the loading of the O2 model.
     */
-    m_Promise: Promise<void>
+    m_Promise: Promise<ISceneLoaderAsyncResult>
 
     /**
         @brief Initializes the O2 entity by setting up its model.

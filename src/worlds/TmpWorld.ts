@@ -3,8 +3,9 @@
     @brief Contains the definition of the VRWorld class, a subclass of ECS.
     It represents a customized world with objects and behavior
 */
-import { ActionManager, ExecuteCodeAction, Mesh, StandardMaterial, UniversalCamera, Vector3 } from "babylonjs";
+import { ActionManager, CannonJSPlugin, ExecuteCodeAction, Mesh, MeshBuilder, PhysicsBody, PhysicsImpostor, PhysicsMotionType, SceneLoader, StandardMaterial, TransformNode, UniversalCamera, Vector3 } from "babylonjs";
 import { ECS, Entity, TextPlane } from "../core";
+import * as cannon from "cannon"
 import {
     LightSource, 
     TransformWidget,
@@ -16,7 +17,8 @@ import {
     Beaker,
     Tray,
     Sink,
-    ResearchTray
+    ResearchTray,
+    Hydrogen
 } from "./prefabs"
 
 export class TmpWorld extends ECS{
@@ -43,16 +45,27 @@ export class TmpWorld extends ECS{
     // Transform Widget
     m_TransformWidget : TransformWidget;
     
+    // Current beaker
+    m_Beaker : Beaker;
+
     /**
      * @brief Initializes the whole scene/ECS
      */
     Init(): void {
 
+        // Initialize Physics
+        window.CANNON = cannon;
+        const cannonjs = new CannonJSPlugin();
+        cannonjs.setTimeStep(1.0 / 60.0);
+        if (!this.enablePhysics(new Vector3(0, -9.81, 0), cannonjs)){
+            throw new Error("Was not able to enable physics!");
+        }
+       
         // Initialize camera position/rotation
         //this.m_Camera.position.set(0, 2, -16.5);
         (this.m_Camera as UniversalCamera).setTarget(new Vector3(-1.48, 1.83, 6.16));
         (this.m_Camera as UniversalCamera).rotation.set(0.17, -1.6, 0);
-        (this.m_Camera as UniversalCamera).position.set(16, 8, 0);
+        (this.m_Camera as UniversalCamera).position.set(16, 11, 0);
 
         this.h2oCounter = 0;
         this.ch4Counter = 0;
@@ -68,12 +81,8 @@ export class TmpWorld extends ECS{
         this.m_LightSource1.position.set(3, 10, 3);
         const lightSource = this.m_LightSource1.m_PointLightSource.m_Light;
         lightSource.intensity = 1;
-    
-        // Initialize all objects
-        this.m_Interactables.push(this.Instantiate(Beaker, "Beaker"));
-        (this.m_Interactables[0] as Beaker).m_Promise.then(()=>{
-            this.m_Interactables[0].position.set(2, 7, 5.6);
-        });
+        // Initialize all objects        
+        this.m_Interactables.push(this.m_Beaker = this.Instantiate(Beaker, "Beaker"));
 
         this.m_Interactables.push(this.Instantiate(Tray, "Oxygen"));
         (this.m_Interactables[1] as Tray).m_Promise.then(()=>{
@@ -87,7 +96,6 @@ export class TmpWorld extends ECS{
             var textPlane = this.m_Interactables[2].GetComponent(TextPlane);
             textPlane.m_TextBlock.text = "Hydrogen";
         });
-
         
         this.m_Interactables.push(this.Instantiate(Tray, "Carbon"));
         (this.m_Interactables[3] as Tray).m_Promise.then(()=>{
@@ -108,7 +116,6 @@ export class TmpWorld extends ECS{
             this.m_Interactables[6].position.set(-0.5, 5.5, -10.86);
         });
         this.m_Interactables.push(this.Instantiate(ResearchTray, "ResearchTray"));
-
 
         this.m_XRPromise.then(() => {
             this.m_ControllerDragFeature.Enable();

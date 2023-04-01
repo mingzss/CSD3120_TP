@@ -11,6 +11,8 @@ import {
   CubeTexture,
   Color3,
   Texture,
+  ISceneLoaderAsyncResult,
+  PhysicsImpostor,
 } from "babylonjs";
 import { Entity } from "../Entity";
 import { Component } from "./Component";
@@ -301,26 +303,30 @@ export class Model extends IMesh {
    *
    * This method is called to load the model file asynchronously
    */
-  public async LoadModel(): Promise<void> {
+  public async LoadModel(): Promise<ISceneLoaderAsyncResult> {
     if (this.m_AssetPath.length == 0) {
       return;
     }
     const filePath = path.basename(this.m_AssetPath);
     const folderPath = path.dirname(this.m_AssetPath) + "/";
-    const result = await SceneLoader.ImportMeshAsync(
+    const modelPromise = SceneLoader.ImportMeshAsync(
       "",
       folderPath,
       filePath,
       this.m_Scene
     );
-    this.m_Mesh = result.meshes[0];
-    this.m_Mesh.id = this.m_Name;
-    this.m_Mesh.name = this.m_Name;
-    this.m_IsLoaded = true;
-    this.m_Mesh.parent = this.m_Entity;
-    this.m_Mesh.material = new StandardMaterial(
-      this.m_Name + " Material",
-      this.m_Scene
-    );
+    return modelPromise.then((result)=>{
+      this.m_Mesh = result.meshes[0];
+      this.m_Mesh.id = this.m_Name;
+      this.m_Mesh.name = this.m_Name;
+      this.m_IsLoaded = true;
+      this.m_Mesh.parent = this.m_Entity;
+      this.m_Mesh.material = new StandardMaterial(
+        this.m_Name + " Material",
+        this.m_Scene
+      );
+      return result;
+    })
+    
   }
 }

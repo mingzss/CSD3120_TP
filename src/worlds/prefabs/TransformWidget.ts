@@ -111,6 +111,7 @@ export class TransformWidget extends Entity{
                     if (pickResult.hit && pickResult.pickedMesh != null && pickResult.pickedPoint != null){
                         // Ignore GUI planes (These cannot be set to isPickable = false else gui stops working)
                         if (pickResult.pickedMesh == this.m_UIPopup.m_Plane.m_Mesh) return;
+                        if (pickResult.pickedMesh.name.endsWith("Tray")) return;
                         
                         // Disable other controls
                         this.m_UIPopup.m_Plane.Disable();
@@ -118,6 +119,9 @@ export class TransformWidget extends Entity{
                         // Store Pick Information
                         this.m_DraggablePicked = true;
                         this.m_DraggedMesh = pickResult.pickedMesh;
+                        if (this.m_DraggedMesh.physicsImpostor != null){
+                            this.m_DraggedMesh.physicsImpostor.setMass(0);
+                        }
                         this.m_InitialPickedPoint = pickResult.pickedPoint;
                         this.m_InitialRayLength = Vector3.Distance(this.m_Camera.position, pickResult.pickedPoint);
                         const camPickedPoint = this.m_Camera.position.add(this.m_Camera.getForwardRay(1).direction.scale(this.m_InitialRayLength));
@@ -174,6 +178,10 @@ export class TransformWidget extends Entity{
                                 break;
                             case InteractState.Rotate:
                                 break;
+                        }
+
+                        if (this.m_DraggedMesh.physicsImpostor != null){
+                            this.m_DraggedMesh.physicsImpostor.setMass(1);
                         }
 
                         // Reset all drag information
@@ -246,7 +254,8 @@ export class TransformWidget extends Entity{
         // Only compare with pickable and enabled meshes
         this.m_Scene.meshes.filter(
                 mesh=> mesh.isPickable && mesh.isEnabled() &&
-                mesh !== this.m_UIPopup.m_Plane.m_Mesh
+                mesh !== this.m_UIPopup.m_Plane.m_Mesh &&
+                !mesh.name.endsWith("Tray")
             ).forEach((mesh) => {
 
             // Loop through the child meshes and check for intersection

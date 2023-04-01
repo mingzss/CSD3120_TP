@@ -2,6 +2,7 @@
     @file H2.ts
     @brief Class representing an entity that loads and displays a 3D model of H2 molecule.
 */
+import { ISceneLoaderAsyncResult } from "babylonjs";
 import {Entity, Model} from "../../core"
 
 export class H2 extends Entity{
@@ -14,7 +15,7 @@ export class H2 extends Entity{
     /**
      * @brief A promise for loading the H2 model.
      */
-    m_Promise: Promise<void>
+    m_Promise: Promise<ISceneLoaderAsyncResult>
 
     /**
      * @brief Initializes the entity by loading and displaying the H2 model.
