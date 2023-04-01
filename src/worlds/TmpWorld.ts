@@ -38,6 +38,7 @@ export class TmpWorld extends ECS{
     ch4Counter: number;
     co2Counter: number;
     hclCounter: number;
+    h2co3Counter: number;
 
     // Information Entity
     m_InfoText: InfoText;
@@ -71,6 +72,7 @@ export class TmpWorld extends ECS{
         this.ch4Counter = 0;
         this.co2Counter = 0;
         this.hclCounter = 0;
+        this.h2co3Counter = 0;
 
         // Initialize all lights
         this.m_ChemistryEnvironment = this.Instantiate(ChemistryEnvironment, "Environment");

@@ -293,7 +293,7 @@ export class ChlorineModel extends Entity{
     Init(): void{
         // Add a Model component for the Chlorine molecule
         this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/Chlorine.glb";
+        this.m_Model.m_AssetPath = "assets/models/Cl2.glb";
 
         // Load the Chlorine model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
