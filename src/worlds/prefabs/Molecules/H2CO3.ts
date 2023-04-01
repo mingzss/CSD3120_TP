@@ -43,7 +43,7 @@ export class H2CO3 extends Entity{
     this.m_H2CO3ModelEntity.position.set(-0.05, 0, 0);
     const beaker = (this.m_ECS as TmpWorld).m_Beaker;
     var tmp = beaker.m_Rigidbody.m_Mesh;
-    this.position.set(tmp.absolutePosition._x, tmp.absolutePosition._y, 1.5 + tmp.absolutePosition._z);
+    this.position.set(tmp.position._x, tmp.position._y, -2.5 + tmp.position._z);
 
     this.m_TextPlane = this.AddComponent(TextPlane);
     this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI / 2, 0);
@@ -180,7 +180,7 @@ export class H2CO3 extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)
@@ -205,7 +205,7 @@ export class H2CO3 extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)

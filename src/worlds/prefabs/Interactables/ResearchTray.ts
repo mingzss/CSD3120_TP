@@ -48,7 +48,7 @@ export class ResearchTray extends Entity{
         const rigidbody = this.AddComponent(Cube);
         rigidbody.m_Mesh.isPickable = false;
         rigidbody.m_Mesh.setParent(null);
-        rigidbody.m_Mesh.scaling.set(2, 0.1, 1.5);
+        rigidbody.m_Mesh.scaling.set(2, 0, 1.5);
         rigidbody.m_Mesh.visibility = 0;
         const impostor = new PhysicsImpostor(
             rigidbody.m_Mesh,

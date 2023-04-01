@@ -184,7 +184,7 @@ export class H2O extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)
@@ -209,7 +209,7 @@ export class H2O extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)
