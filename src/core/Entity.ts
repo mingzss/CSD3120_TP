@@ -2,7 +2,7 @@
     @file Entity.ts
     @brief A Entity class that serves as the base class for objects to hold components
 */
-import { ActionManager, Scene, TransformNode } from "babylonjs";
+import { ActionManager, Observable, Scene, TransformNode } from "babylonjs";
 import { ECS } from "./ECS";
 import { Component } from "./Components/Component";
 
@@ -18,6 +18,10 @@ export abstract class Entity extends TransformNode {
   m_Scene: Scene;
   /* The entity-component system that the entity belongs to. */
   m_ECS: ECS;
+
+  // observable for distance between research tray to atom/molecules entities
+  distanceDifferenceObservable : Observable<number>;
+    
   /**
    * @brief The name of the entity.
    * @details This is a getter/setter property that gets/sets the name of the entity.
