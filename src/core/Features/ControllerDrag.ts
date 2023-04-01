@@ -38,6 +38,7 @@ export class ControllerDrag {
     let selectedMesh: AbstractMesh;
     let rootMesh: AbstractMesh;
     let parentTransform: TransformNode;
+    let originalMass: number;
 
     // Add a callback to run when a new motion controller is added to the scene
     this.m_ECS.m_XR.input.onControllerAddedObservable.add((controller) => {
@@ -57,6 +58,10 @@ export class ControllerDrag {
                   controller.uniqueId
                 ))
             ) {
+              if (selectedMesh.physicsImpostor != null){
+                originalMass = selectedMesh.physicsImpostor.mass;
+                selectedMesh.physicsImpostor.setMass(0);
+              }
               rootMesh = selectedMesh;
               while (rootMesh.parent) {
                 //get top root of the mesh
@@ -83,6 +88,11 @@ export class ControllerDrag {
             }
           } else {
             // If the trigger is not pressed
+            if (selectedMesh){
+              if (selectedMesh.physicsImpostor != null){
+                selectedMesh.physicsImpostor.setMass(originalMass);
+              }
+            }
             if (rootMesh && rootMesh.parent) {
               // If a mesh is attached to the motion controller
               console.log("detaching mesh: " + rootMesh.name);

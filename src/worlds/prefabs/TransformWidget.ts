@@ -33,6 +33,7 @@ export class TransformWidget extends Entity{
     m_InitialDragObjectScale: Vector3;
     m_InitialDragObjectRotationOffset: Vector3;
     m_InitialRayLength: number;
+    m_DragObjectMass: number;
     m_CameraToPickedTargetLine: LinesMesh;
 
     // Camera of Scene
@@ -120,6 +121,7 @@ export class TransformWidget extends Entity{
                         this.m_DraggablePicked = true;
                         this.m_DraggedMesh = pickResult.pickedMesh;
                         if (this.m_DraggedMesh.physicsImpostor != null){
+                            this.m_DragObjectMass = this.m_DraggedMesh.physicsImpostor.mass;
                             this.m_DraggedMesh.physicsImpostor.setMass(0);
                         }
                         this.m_InitialPickedPoint = pickResult.pickedPoint;
@@ -181,7 +183,7 @@ export class TransformWidget extends Entity{
                         }
 
                         if (this.m_DraggedMesh.physicsImpostor != null){
-                            this.m_DraggedMesh.physicsImpostor.setMass(1);
+                            this.m_DraggedMesh.physicsImpostor.setMass(this.m_DragObjectMass);
                         }
 
                         // Reset all drag information

@@ -306,11 +306,15 @@ export class CarbonModel extends Entity{
 
         // Load the Carbon model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
-        this.m_Promise.then(()=>{
+        this.m_Promise.then((result)=>{
             this.m_Model.m_Mesh.name = this.name + " Mesh";
             this.m_Model.m_Mesh.id = this.name + " Mesh";
             this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
             this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
+            result.meshes.forEach((mesh)=>{
+              mesh.isPickable = false;
+            });
+            return result;
         })
     }
 
