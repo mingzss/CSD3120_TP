@@ -2,19 +2,13 @@
     @file HCL.ts
     @brief Class representing an entity that loads and displays a 3D model of HCL molecules.
 */
-import { AbstractMesh, ActionManager, ExecuteCodeAction, StandardMaterial, Vector3 } from "babylonjs";
-import { Entity, Model, TextPlane } from "../../../core"
+import { AbstractMesh, ActionManager, ExecuteCodeAction, ISceneLoaderAsyncResult, PhysicsImpostor, StandardMaterial, Vector3 } from "babylonjs";
+import { Cube, Entity, Model, TextPlane } from "../../../core"
 import { TmpWorld } from "../../TmpWorld";
 import { Beaker } from "../Interactables/Beaker";
 import { ResearchTray } from "../Interactables/ResearchTray";
 
-export class H2CO3 extends Entity {
-
-  /**
-   * @brief The model component for the HCL molecule.
-   */
-  m_Model: Model;
-
+export class H2CO3 extends Entity{
   m_TextPlane: TextPlane;
 
   actionManager: ActionManager;
@@ -23,86 +17,83 @@ export class H2CO3 extends Entity {
 
   placedInBeaker: boolean;
 
-  /**
-   * @brief A promise for loading the HCL model.
-   */
-  m_Promise: Promise<void>
-
-  /**
-   * @brief Initializes the entity by loading and displaying the HCL model.
-   */
+  m_Rigidbody: Cube;
+  m_H2CO3ModelEntity: H2CO3Model;
+  
   Init(): void {
-    // Add a Model component for the HCL molecule
-    this.m_Model = this.AddComponent(Model);
-    this.m_Model.m_AssetPath = "assets/models/H2CO3.glb";
     this.usingResearchTray = false;
     this.placedInBeaker = false;
 
-    // Load the HCL model and store the promise for future use
-    this.m_Promise = this.m_Model.LoadModel();
-    this.m_Promise.then(() => {
-      this.scaling.setAll(0.5);
-      var tmp = this.m_Scene.getTransformNodeById("Beaker");
-      this.position.set(tmp.absolutePosition._x, tmp.absolutePosition._y, 1.5 + tmp.absolutePosition._z);
+    this.m_Rigidbody = this.AddComponent(Cube);
+    this.m_Rigidbody.m_Mesh.setParent(null);
+    this.m_Rigidbody.m_Mesh.scaling.set(1.2, 0.3, 1.3);
+    this.m_Rigidbody.m_Mesh.visibility = 0;
+    const impostor = new PhysicsImpostor(
+        this.m_Rigidbody.m_Mesh,
+        PhysicsImpostor.BoxImpostor,
+        { mass: 1, restitution: 0.2, friction: 0.2 },
+        this.m_Scene
+      );
+    this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
+    this.m_Rigidbody.m_Mesh.setParent(this);
 
-      this.m_Model.m_Mesh.name = this.name + " Mesh";
-      this.m_Model.m_Mesh.id = this.name + " Mesh";
-      this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
-      this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
+    this.m_H2CO3ModelEntity = this.m_ECS.Instantiate(H2CO3Model, "H2CO3 Model");
+    this.m_H2CO3ModelEntity.scaling.setAll(0.5);
+    this.m_H2CO3ModelEntity.setParent(this.m_Rigidbody.m_Mesh);
+    this.m_H2CO3ModelEntity.position.set(-0.05, 0, 0);
+    const beaker = (this.m_ECS as TmpWorld).m_Beaker;
+    var tmp = beaker.m_Rigidbody.m_Mesh;
+    this.position.set(tmp.absolutePosition._x, tmp.absolutePosition._y, 1.5 + tmp.absolutePosition._z);
 
-      this.m_TextPlane = this.AddComponent(TextPlane);
-      this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI / 2, 0);
-      this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
-      this.m_TextPlane.m_GUITexture.background = "purple";
-      this.m_TextPlane.m_TextBlock.color = "white";
-      this.m_TextPlane.m_Mesh.scaling.setAll(1);
-      this.m_TextPlane.m_TextBlock.fontSize = 10;
-      this.m_TextPlane.m_TextBlock.textWrapping = true;
-      this.m_TextPlane.m_Mesh.isPickable = false;
-      this.m_TextPlane.m_TextBlock.text = this.m_Name + "(H2CO3)";
-      (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
+    this.m_TextPlane = this.AddComponent(TextPlane);
+    this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI / 2, 0);
+    this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
+    this.m_TextPlane.m_GUITexture.background = "purple";
+    this.m_TextPlane.m_TextBlock.color = "white";
+    this.m_TextPlane.m_Mesh.scaling.setAll(1);
+    this.m_TextPlane.m_TextBlock.fontSize = 10;
+    this.m_TextPlane.m_TextBlock.textWrapping = true;
+    this.m_TextPlane.m_Mesh.isPickable = false;
+    this.m_TextPlane.m_TextBlock.text = this.m_Name + "(H2CO3)";
+    (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
+    this.m_TextPlane.m_Mesh.setParent(this.m_Rigidbody.m_Mesh);
 
-      this.actionManager = this.m_Scene.getLastMeshById(this.name + " Mesh").actionManager = new ActionManager(this.m_Scene);
-      this.m_TextPlane.m_Mesh.isVisible = false;
+    this.actionManager = this.m_Rigidbody.m_Mesh.actionManager = new ActionManager(this.m_Scene);
+    this.m_TextPlane.m_Mesh.isVisible = false;
 
-      this.InitAction();
-    })
+    this.InitAction();
   }
 
-  /**
-   * @brief Empty method to satisfy the abstract class Entity.
-   */
   Update(): void {
-    this.m_Promise.then(() => {
-      const beakerMesh = this._scene.getMeshById("Beaker");
-      const currMesh = this.m_Scene.getLastMeshById(this.name + " Mesh");
-      if (beakerMesh === null || currMesh === null) return;
-      if (beakerMesh.intersectsMesh(currMesh)) {
-        if (this.placedInBeaker == false) {
-          this.m_TextPlane.m_Mesh.isVisible = false;
-          let atomParent: AbstractMesh;
-          atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
+    const beaker = (this.m_ECS as TmpWorld).m_Beaker;
+    if (beaker === null) return;
+    if (beaker.m_Rigidbody.m_Mesh.intersectsMesh(this.m_Rigidbody.m_Mesh)) {
+      if (this.placedInBeaker == false) {
+        this.m_TextPlane.m_Mesh.isVisible = false;
+        let atomParent: AbstractMesh;
+        atomParent = this.m_Rigidbody.m_Mesh.parent as AbstractMesh;
 
-          atomParent.setParent(null);
-          var tmpWorld = this.m_ECS as TmpWorld;
-          tmpWorld.m_TransformWidget.m_DraggablePicked = false;
-          tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
+        atomParent.setParent(null);
+        this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+        this.m_Rigidbody.m_Mesh.position.setAll(0);  
+        var tmpWorld = this.m_ECS as TmpWorld;
+        tmpWorld.m_TransformWidget.m_DraggablePicked = false;
+        tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
 
-          atomParent.setParent(beakerMesh);
-          atomParent.position = Vector3.Random(-1, 1);
-          this.placedInBeaker = true;
-          var tmpWorld = this.m_ECS as TmpWorld;
-          for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
-            if (tmpWorld.m_Interactables[i].m_Name === "Beaker") {
-              var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
-              beakerEntity.h2co3Counter++;
-              tmpWorld.h2co3Counter++;
-              break;
-            }
+        atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+        atomParent.position = Vector3.Random(-1, 1);
+        this.placedInBeaker = true;
+        var tmpWorld = this.m_ECS as TmpWorld;
+        for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+          if (tmpWorld.m_Interactables[i].m_Name === "Beaker") {
+            var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
+            beakerEntity.h2co3Counter++;
+            tmpWorld.h2co3Counter++;
+            break;
           }
         }
       }
-    });
+    }
   }
 
   private InitAction() {
@@ -189,15 +180,18 @@ export class H2CO3 extends Entity {
         },
       },
       () => {
-        if (this.parent.name === "Beaker") return;
+        if (this.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)
             tmpWorld.m_Interactables.splice(i, 1);
         }
-        this.m_Model.m_Mesh.dispose();
+        this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+        this.m_Rigidbody.m_Mesh.dispose();
+        this.m_H2CO3ModelEntity.m_Model.m_Mesh.dispose();
         this.m_TextPlane.m_Mesh.dispose();
-        this.dispose();
+        this.Destroy();
+        this.m_H2CO3ModelEntity.Destroy();
       }
     )
     );
@@ -211,17 +205,59 @@ export class H2CO3 extends Entity {
         },
       },
       () => {
-        if (this.parent.name === "Beaker") return;
+        if (this.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)
             tmpWorld.m_Interactables.splice(i, 1);
         }
-        this.m_Model.m_Mesh.dispose();
+        this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+        this.m_Rigidbody.m_Mesh.dispose();
+        this.m_H2CO3ModelEntity.m_Model.m_Mesh.dispose();
         this.m_TextPlane.m_Mesh.dispose();
-        this.dispose();
-      }
-    )
+        this.Destroy();
+        this.m_H2CO3ModelEntity.Destroy();
+      })
     );
   }
+}
+
+export class H2CO3Model extends Entity {
+
+  /**
+   * @brief The model component for the HCL molecule.
+   */
+  m_Model: Model;
+
+ 
+  /**
+   * @brief A promise for loading the HCL model.
+   */
+  m_Promise: Promise<ISceneLoaderAsyncResult>
+
+  /**
+   * @brief Initializes the entity by loading and displaying the HCL model.
+   */
+  Init(): void {
+    // Add a Model component for the HCL molecule
+    this.m_Model = this.AddComponent(Model);
+    this.m_Model.m_AssetPath = "assets/models/H2CO3.glb";
+
+    // Load the HCL model and store the promise for future use
+    this.m_Promise = this.m_Model.LoadModel();
+    this.m_Promise.then(() => {
+      this.m_Model.m_Mesh.name = this.name + " Mesh";
+      this.m_Model.m_Mesh.id = this.name + " Mesh";
+      this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
+      this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
+    })
+  }
+
+  /**
+   * @brief Empty method to satisfy the abstract class Entity.
+   */
+  Update(): void {
+
+  }
+
 }

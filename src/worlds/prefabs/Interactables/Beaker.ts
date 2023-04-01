@@ -294,14 +294,10 @@ export class Beaker extends Entity{
                 this.Destroy();
                 this.m_BeakerModelEntity.Destroy();
 
-                var h2co3Name = "HCL Molecule " + tmpWorld.h2co3Counter.toString();
+                var h2co3Name = "H2CO3 Molecule " + tmpWorld.h2co3Counter.toString();
                 var h2co3Entity = tmpWorld.Instantiate(H2CO3, h2co3Name);
                 tmpWorld.h2co3Counter++;
-                h2co3Entity.m_Promise.then(() => {
-                    console.log("HCL Promise: " + this.name);
-                    tmpWorld.m_Interactables.push(h2co3Entity);
-                    return;
-                });
+                tmpWorld.m_Interactables.push(h2co3Entity);
             }
             else if (this.hydrogenCounter === 0 && this.oxygenCounter === 0 &&
                 this.h2oCounter == 0 && this.ch4Counter == 0 &&

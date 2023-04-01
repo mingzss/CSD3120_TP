@@ -192,8 +192,7 @@ export class CH4 extends Entity{
         this.m_TextPlane.m_Mesh.dispose();
         this.Destroy();
         this.m_CH4ModelEntity.Destroy();
-  }
-    )
+      })
     );
 
     const otherMesh2 = this._scene.getMeshById("Sink2");
