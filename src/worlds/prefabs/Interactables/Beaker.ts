@@ -40,7 +40,7 @@ export class Beaker extends Entity{
     createParticles(filepath: string) {
         const particleSystem = new ParticleSystem("particleSystem", 5000, this.m_Scene);
         particleSystem.particleTexture = new Texture(filepath, this.m_Scene);
-        particleSystem.emitter = this.m_Rigidbody.m_Mesh.position;
+        particleSystem.emitter = this.m_Rigidbody.m_Mesh.getAbsolutePosition();
         particleSystem.minEmitBox = new Vector3(0, 0, 0);
         particleSystem.color1 = new Color4(1, 1, 1, 1);
         particleSystem.color2 = new Color4(1, 1, 1, 0);
@@ -91,7 +91,7 @@ export class Beaker extends Entity{
         const impostor = new PhysicsImpostor(
             this.m_Rigidbody.m_Mesh,
             PhysicsImpostor.BoxImpostor,
-            { mass: 1, restitution: -0.1 },
+            { mass: 1, restitution: 0, friction: 2 },
             this.m_Scene
           );
         this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
@@ -121,34 +121,37 @@ export class Beaker extends Entity{
         this.m_BeakerModelEntity.scaling.setAll(0.25);
         this.m_BeakerModelEntity.setParent(this.m_Rigidbody.m_Mesh);
         this.m_BeakerModelEntity.position.set(0, 0.1, 0);
-        this.m_Rigidbody.m_Mesh.position.set(2, 7.5, 7);
+        this.m_Rigidbody.m_Mesh.position.set(2, 7, 7);
     }
 
     Update(): void {
         if (this.m_Rigidbody.m_Mesh.position.y <= -1000)
         {
-            this.m_Rigidbody.m_Mesh.position.set(2, 7.5, 7);
+            this.m_Rigidbody.m_Mesh.position.set(2, 7, 7);
         }
         if (this.shakecounter > 6) {
             //if correct => play sound + spawn new molecule + dispose beaker
             //if wrong => play sound + explosion particles + fade beaker
             console.log(this.m_Rigidbody.m_Mesh.name);
-            var atomsInBeaker = this.m_Rigidbody.m_Mesh.getChildTransformNodes(true);
+            var atomsInBeaker = this.m_BeakerModelEntity.m_Model.m_Mesh.getChildTransformNodes(true);
             var tmpWorld = this.m_ECS as TmpWorld;
             atomsInBeaker.forEach((mesh) => {
                 console.log("child nodes: " + mesh.name);
-                for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
-                    if (tmpWorld.m_Interactables[i].name === mesh.name) {
-                        tmpWorld.m_Interactables.splice(i, 1);
-                        break;
+                if (mesh.name !== "Beaker") {
+                    for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+                        if (tmpWorld.m_Interactables[i].name === mesh.name) {
+                            tmpWorld.m_Interactables.splice(i, 1);
+                            break;
+                        }
                     }
+                    var atomchildren = mesh.getChildMeshes();
+                    atomchildren.forEach((childchild) => {
+                        childchild.dispose();
+    
+                    });
+                    mesh.dispose();
                 }
-                var atomchildren = mesh.getChildMeshes();
-                atomchildren.forEach((childchild) => {
-                    childchild.dispose();
 
-                });
-                mesh.dispose();
             })
             console.log(this.hydrogenCounter + " h and o: " + this.oxygenCounter + " h20:" + this.h2oCounter);
             var tmpWorld = this.m_ECS as TmpWorld;
@@ -354,7 +357,7 @@ export class Beaker extends Entity{
                 beakerNode.setParent(null);
                 tmpWorld.m_TransformWidget.m_DraggablePicked = false;
                 tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
-                var beakerMesh = this.m_BeakerModelEntity.m_Model.m_Mesh;
+                var beakerMesh = this.m_BeakerModelEntity.m_Model.m_Mesh.getChildMeshes()[0];
                 if (beakerMesh.visibility >= 0) {
                     beakerMesh.visibility -= 0.01;
                 }
