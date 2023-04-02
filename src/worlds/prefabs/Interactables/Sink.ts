@@ -24,12 +24,13 @@ export class Sink extends Entity{
     Init(): void{
         // Add a Model component for the Sink
         this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/sink.glb";
+        this.m_Model.m_AssetPath = "assets/models/water_animation.glb";
         
         // Load the Sink model and store the promise for future use
         this.m_Promise = this.m_Model.LoadModel();
         this.m_Promise.then(()=>{
-            this.position.set(-0.5, 5.5, 9.26);
+            this.position.set(-0.5, 5.85, 9.26);
+            this.scaling.set(0.03, 0.05, 0.02);
             this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name;
             this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name;
             this.getChildMeshes().forEach((mesh)=>{

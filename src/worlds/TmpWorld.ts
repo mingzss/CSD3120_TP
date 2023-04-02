@@ -122,7 +122,7 @@ export class TmpWorld extends ECS{
         this.m_Interactables.push(this.Instantiate(Sink, "Sink"));
         this.m_Interactables.push(this.Instantiate(Sink, "Sink2"));
         (this.m_Interactables[6] as Tray).m_Promise.then(()=>{
-            this.m_Interactables[6].position.set(-0.5, 5.5, -10.86);
+            this.m_Interactables[6].position.set(-0.5, 5.85, -10.86);
         });
         this.m_Interactables.push(this.Instantiate(ResearchTray, "ResearchTray"));
         this.m_researchTrayEntity = this.m_Interactables[this.m_Interactables.length - 1];
