@@ -116,7 +116,7 @@ export class Chlorine extends Entity{
                     var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
                     if (researchTrayEntity.inUse) break;
                     else {
-                        researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine with one hydrogen to get HCL"
+                        researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine with one hydrogen to get two HCL!"
                         researchTrayEntity.inUse = true;
                         this.usingResearchTray = true;
                         break;

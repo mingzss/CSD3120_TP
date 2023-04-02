@@ -116,7 +116,7 @@ export class H2O extends Entity{
             var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
             if (researchTrayEntity.inUse) break;
             else {
-              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine with one more oxygen to get H2O2"
+              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine one H2O with one CO2 to get H2CO3!"
               researchTrayEntity.inUse = true;
               this.usingResearchTray = true;
               break;

@@ -117,7 +117,7 @@ export class Hydrogen extends Entity{
                     var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
                     if (researchTrayEntity.inUse) break;
                     else {
-                        researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine four hydrogen with one carbon to get CH4 or two hydrogen with one oxygen to get H2O or combine with one chlorine to get HCL"
+                        researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine two hydrogen with one carbon to get CH4 or two hydrogen with one oxygen to get two H2O or combine with one chlorine to get HCL!"
                         researchTrayEntity.inUse = true;
                         this.usingResearchTray = true;
                         break;

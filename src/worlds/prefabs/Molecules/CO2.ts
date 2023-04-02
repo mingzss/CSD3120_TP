@@ -111,7 +111,7 @@ export class CO2 extends Entity{
             var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
             if (researchTrayEntity.inUse) break;
             else {
-              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Can't combine with any atoms to further develop this molecule"
+              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine one CO2 with one H2O to get H2CO3!"
               researchTrayEntity.inUse = true;
               this.usingResearchTray = true;
               break;

@@ -58,8 +58,6 @@ export class Oxygen extends Entity{
 
         this.actionManager = this.m_Rigidbody.m_Mesh.actionManager = new ActionManager(this.m_Scene);
         this.m_TextPlane.m_Mesh.isVisible = false;
-        //this.sixDofDragBehavior = new SixDofDragBehavior();
-        //this.m_Model.m_Entity.addBehavior(this.sixDofDragBehavior);
         this.InitAction();
     }
 
@@ -69,7 +67,6 @@ export class Oxygen extends Entity{
         if (beaker.m_Rigidbody.m_Mesh.intersectsMesh(this.m_Rigidbody.m_Mesh))
         {
             if (this.placedInBeaker == false) {
-                console.log("intersecting w beaker " + this.m_Rigidbody.m_Mesh.parent.name);
                 this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
                 let atomParent: AbstractMesh;
                 atomParent = this.m_Rigidbody.m_Mesh.parent as AbstractMesh;
@@ -77,20 +74,16 @@ export class Oxygen extends Entity{
                 atomParent.setParent(null);
                 this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
                 this.m_Rigidbody.m_Mesh.position.setAll(0);
-                //atomParent.position = beakerMesh.position;
                 var tmpWorld = this.m_ECS as TmpWorld;
                 tmpWorld.m_TransformWidget.m_DraggablePicked = false;
                 tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
-                console.log("setting parent");
                 atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
                 atomParent.position = Vector3.Random(-1, 1);
                 this.placedInBeaker = true;
-                //this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
                 var tmpWorld = this.m_ECS as TmpWorld;
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                     if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
                     {
-                        console.log("found beaker!");
                         var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
                         beakerEntity.oxygenCounter++;
                         break;
@@ -128,7 +121,7 @@ export class Oxygen extends Entity{
                         var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
                         if (researchTrayEntity.inUse) break;
                         else {
-                            researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine with two hydrogen to get H20 or two oxygen with one carbon to get CO2"
+                            researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine one oxygen with two hydrogen to get two H2O or one oxygen with one carbon to get CO2!"
                             researchTrayEntity.inUse = true;
                             this.usingResearchTray = true;
                             break;
