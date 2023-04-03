@@ -3,7 +3,7 @@
     @brief Contains the definition of the TransformWidget class, a subclass of Entity.
     It is responsible for controlling the transformation and merging/splitting of objects.
 */
-import { AbstractMesh, Camera, Color3, LinesMesh, Material, MeshBuilder, PointerEventTypes, Space, StandardMaterial, SubMesh, TransformNode, Vector3 } from "babylonjs";
+import { AbstractMesh, Camera, Color3, LinesMesh, Material, Mesh, MeshBuilder, PointerEventTypes, Space, StandardMaterial, SubMesh, TransformNode, Vector3 } from "babylonjs";
 import {ECS, Entity, Sphere} from "../../core"
 import { ProgressBar } from "./ProgressBar";
 import { UIPopup} from "./UIPopup"
@@ -113,8 +113,13 @@ export class TransformWidget extends Entity{
                         // Ignore GUI planes (These cannot be set to isPickable = false else gui stops working)
                         if (pickResult.pickedMesh == this.m_UIPopup.m_Plane.m_Mesh) return;
                         if (pickResult.pickedMesh.name.endsWith("Tray")) return;
-                        
-                        // Disable other controls
+                        let rootMesh: AbstractMesh;
+                        rootMesh = pickResult.pickedMesh
+                        while (rootMesh.parent) {
+                            rootMesh = rootMesh.parent as Mesh;
+                        }
+                        if (rootMesh.name == "Environment") return;
+                        //Disable other controls
                         this.m_UIPopup.m_Plane.Disable();
 
                         // Store Pick Information
@@ -258,7 +263,7 @@ export class TransformWidget extends Entity{
         this.m_Scene.meshes.filter(
                 mesh=> mesh.isPickable && mesh.isEnabled() &&
                 mesh !== this.m_UIPopup.m_Plane.m_Mesh &&
-                !mesh.name.endsWith("Tray")
+                !mesh.name.endsWith("Tray") && tNode.name == "Environment"
             ).forEach((mesh) => {
 
             // Loop through the child meshes and check for intersection
@@ -286,6 +291,7 @@ export class TransformWidget extends Entity{
 
         // Loop through all intersecting nodes and update the visuals
         intersectingNodes.forEach((nodeMesh)=>{
+            if(nodeMesh.name == "Environment") return;
             nodeMesh.getChildMeshes().forEach((mesh)=>{
                 mesh.showBoundingBox = true;
             })

@@ -138,22 +138,26 @@ export class TmpWorld extends ECS{
         // Initialize Transform Widget
         this.m_TransformWidget = this.Instantiate(TransformWidget, "Transform Widget");
 
-        // // Enable Teleportation (Only works with controllers)
-        // const arrowMaterial = new StandardMaterial("Arrow Material", this);
-        // this.m_XRPromise.then(()=>{
-        //     this.m_LocomotionFeature.EnableTeleportation(
-        //         [this.m_BaseEnvironment.m_Ground.m_Mesh as Mesh], 
-        //         2000,
-        //         true,
-        //         "#55FF99",
-        //         "blue",
-        //         arrowMaterial,
-        //         {
-        //             enabled: true,
-        //             checkRadius: 2
-        //         }
-        //     );    
-        // });
+        // Enable Teleportation (Only works with controllers)
+        const arrowMaterial = new StandardMaterial("Arrow Material", this);
+        this.m_XRPromise.then(()=>{
+            this.m_ChemistryEnvironment.m_Promise.then(() => {
+                var labMesh = this.getLastMeshById("pPlane1_lambert1_0") as Mesh;
+                console.log(labMesh);
+                this.m_LocomotionFeature.EnableTeleportation(
+                    [labMesh], 
+                    2000,
+                    true,
+                    "#55FF99",
+                    "blue",
+                    arrowMaterial,
+                    {
+                        enabled: true,
+                        checkRadius: 2
+                    }
+                );    
+            });
+        });
     
         // // Set bounding box renderer to render red
         this.getBoundingBoxRenderer().frontColor.set(1, 0, 0);

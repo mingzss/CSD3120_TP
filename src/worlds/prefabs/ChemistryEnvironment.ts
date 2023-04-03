@@ -39,9 +39,9 @@ export class ChemistryEnvironment extends Entity {
     this.m_Promise.then((result) => {
       // Do nothing for now
       this.m_Model.m_Mesh.scaling.setAll(100);
-      this.getChildMeshes().forEach((mesh)=>{
-        mesh.isPickable = false;
-      });
+      // this.getChildMeshes().forEach((mesh)=>{
+      //   mesh.isPickable = false;
+      // });
       
       const groundMesh = MeshBuilder.CreateBox("Ground Mesh", {size: 1}, this.m_Scene);
       groundMesh.scaling.set(50, 5, 60);
@@ -52,7 +52,7 @@ export class ChemistryEnvironment extends Entity {
         this.m_Scene
       );
       groundMesh.position.set(0, -2.6, 0);
-      groundMesh.isPickable = false;
+      //groundMesh.isPickable = false;
 
       const wall1Mesh = MeshBuilder.CreateBox("Wall1 Mesh", {size: 1}, this.m_Scene);
       wall1Mesh.scaling.set(5, 20, 60);

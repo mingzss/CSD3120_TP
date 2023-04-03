@@ -62,6 +62,7 @@ export class ControllerDrag {
                 originalMass = selectedMesh.physicsImpostor.mass;
                 selectedMesh.physicsImpostor.setMass(0);
               }
+              if (selectedMesh.name.endsWith("Tray")) return;
               rootMesh = selectedMesh;
               while (rootMesh.parent) {
                 //get top root of the mesh
@@ -73,6 +74,7 @@ export class ControllerDrag {
                 }
                 rootMesh = rootMesh.parent as Mesh;
               }
+              if (rootMesh.name == "Environment") return;
               // If the mesh is not locked, calculate the distance between the mesh and the controller
               if (!this.m_LockedMeshes.has(rootMesh)) {
                 const distance = Vector3.Distance(

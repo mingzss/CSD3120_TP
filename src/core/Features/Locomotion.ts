@@ -48,15 +48,16 @@ export class Locomotion {
       checkRadius: number;
     } = { enabled: true, checkRadius: 2 }
   ) {
-    // Disable other locomotion features.
-    this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
-      WebXRFeatureName.MOVEMENT
-    );
-    this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
-      WebXRFeatureName.WALKING_LOCOMOTION
-    );
+    // // Disable other locomotion features.
+    // this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
+    //   WebXRFeatureName.MOVEMENT
+    // );
+    // this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
+    //   WebXRFeatureName.WALKING_LOCOMOTION
+    // );
 
     // Enable teleportation feature.
+    console.log(this.m_ECS.m_XR.input)
     const teleportation =
       this.m_ECS.m_XR.baseExperience.featuresManager.enableFeature(
         WebXRFeatureName.TELEPORTATION,
@@ -76,6 +77,8 @@ export class Locomotion {
         true
       ) as WebXRMotionControllerTeleportation;
 
+      console.log("registered");
+      
     // Set parabolic ray options.
     teleportation.parabolicRayEnabled = parabolicOptions.enabled;
     teleportation.parabolicCheckRadius = parabolicOptions.checkRadius;
