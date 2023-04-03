@@ -3,6 +3,7 @@
     @brief A class that offers utility functions to enable locomotion features
 */
 import {
+  AbstractMesh,
   Material,
   Mesh,
   WebXRControllerMovement,
@@ -11,12 +12,14 @@ import {
 } from "babylonjs";
 import { ECS } from "../ECS";
 import { Entity } from "../Entity";
+import { TmpWorld } from "../../worlds/TmpWorld";
 
 /**
  * This class provides locomotion functionality for XR experiences.
  */
 export class Locomotion {
   m_ECS: ECS;
+  m_Teleportation: WebXRMotionControllerTeleportation;
 
   /**
    * Creates a new instance of Locomotion.
@@ -48,24 +51,27 @@ export class Locomotion {
       checkRadius: number;
     } = { enabled: true, checkRadius: 2 }
   ) {
-    // Disable other locomotion features.
-    this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
-      WebXRFeatureName.MOVEMENT
-    );
-    this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
-      WebXRFeatureName.WALKING_LOCOMOTION
-    );
+    // // Disable other locomotion features.
+    // this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
+    //   WebXRFeatureName.MOVEMENT
+    // );
+    // this.m_ECS.m_XR.baseExperience.featuresManager.disableFeature(
+    //   WebXRFeatureName.WALKING_LOCOMOTION
+    // );
 
     // Enable teleportation feature.
-    const teleportation =
+
+
+    this.m_Teleportation =
       this.m_ECS.m_XR.baseExperience.featuresManager.enableFeature(
         WebXRFeatureName.TELEPORTATION,
         "stable",
         {
           xrInput: this.m_ECS.m_XR.input,
-          floorMeshes: ground,
+          //floorMeshes: ground,
+          //pickBlockerMeshes: roomMeshes,
           timeToTeleport: teleportTime,
-          useMainComponentsOnly: useMainComps,
+          useMainComponentOnly: useMainComps,
           defaultTargetMeshOptions: {
             teleportationFillColor: fillColor,
             teleportationBorderColor: borderColor,
@@ -76,9 +82,12 @@ export class Locomotion {
         true
       ) as WebXRMotionControllerTeleportation;
 
+      console.log("registered");
+      
     // Set parabolic ray options.
-    teleportation.parabolicRayEnabled = parabolicOptions.enabled;
-    teleportation.parabolicCheckRadius = parabolicOptions.checkRadius;
+    this.m_Teleportation.parabolicRayEnabled = parabolicOptions.enabled;
+    this.m_Teleportation.parabolicCheckRadius = parabolicOptions.checkRadius;
+
   }
 
   /**

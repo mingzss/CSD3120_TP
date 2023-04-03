@@ -3,12 +3,12 @@
     @brief Class representing an entity that loads and displays a 3D model of Carbon atom.
 */
 import { AbstractMesh, ActionManager, ExecuteCodeAction, ISceneLoaderAsyncResult, PhysicsImpostor, StandardMaterial, Vector3 } from "babylonjs";
-import {Cube, Entity, Model, TextPlane} from "../../../core"
+import { Cube, Entity, Model, TextPlane } from "../../../core"
 import { TmpWorld } from "../../TmpWorld";
 import { Beaker } from "../Interactables/Beaker";
 import { ResearchTray } from "../Interactables/ResearchTray";
 
-export class Carbon extends Entity{
+export class Carbon extends Entity {
   m_TextPlane: TextPlane;
 
   actionManager: ActionManager;
@@ -28,14 +28,15 @@ export class Carbon extends Entity{
     this.m_Rigidbody.m_Mesh.setParent(null);
     this.m_Rigidbody.m_Mesh.scaling.set(0.35, 0.35, 0.35);
     this.m_Rigidbody.m_Mesh.visibility = 0;
-  const impostor = new PhysicsImpostor(
-        this.m_Rigidbody.m_Mesh,
-        PhysicsImpostor.BoxImpostor,
-        { mass: 1, restitution: 0.2, friction: 0.2 },
-        this.m_Scene
-      );
+    const impostor = new PhysicsImpostor(
+      this.m_Rigidbody.m_Mesh,
+      PhysicsImpostor.BoxImpostor,
+      { mass: 1, restitution: 0.2, friction: 0.2 },
+      this.m_Scene
+    );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
     this.m_Rigidbody.m_Mesh.setParent(this);
+    this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
     this.m_CarbonModelEntity = this.m_ECS.Instantiate(CarbonModel, "Carbon Model");
     this.m_CarbonModelEntity.scaling.setAll(0.5);
@@ -44,7 +45,7 @@ export class Carbon extends Entity{
     this.position.set(tmp.absolutePosition._x, 0.15 + tmp.absolutePosition._y, tmp.absolutePosition._z);
 
     this.m_TextPlane = this.AddComponent(TextPlane);
-    this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);
+    this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI / 2, 0);
     this.m_TextPlane.m_Mesh.position.set(0, 1, 0);
     this.m_TextPlane.m_GUITexture.background = "purple";
     this.m_TextPlane.m_TextBlock.color = "white";
@@ -55,7 +56,7 @@ export class Carbon extends Entity{
     this.m_TextPlane.m_TextBlock.text = this.m_Name + "(C)";
     (this.m_TextPlane.m_Mesh.material as StandardMaterial).disableLighting = true;
     this.m_TextPlane.m_Mesh.setParent(this.m_Rigidbody.m_Mesh);
-    
+
     this.actionManager = this.m_Rigidbody.m_Mesh.actionManager = new ActionManager(this.m_Scene);
     this.m_TextPlane.m_Mesh.isVisible = false;
 
@@ -65,176 +66,169 @@ export class Carbon extends Entity{
   Update(): void {
     const beaker = (this.m_ECS as TmpWorld).m_Beaker;
     if (beaker === null) return;
-    if (beaker.m_Rigidbody.m_Mesh.intersectsMesh(this.m_Rigidbody.m_Mesh))
-    {
+    if (beaker.m_Rigidbody.m_Mesh.intersectsMesh(this.m_Rigidbody.m_Mesh)) {
       if (this.placedInBeaker == false) {
         console.log("intersecting w beaker " + this.m_Rigidbody.m_Mesh.parent.name);
         this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
         let atomParent: AbstractMesh;
         atomParent = this.m_Rigidbody.m_Mesh.parent as AbstractMesh;
-        
+
         atomParent.setParent(null);
         this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
         this.m_Rigidbody.m_Mesh.position.setAll(0);
-        //atomParent.position = beakerMesh.position;
         var tmpWorld = this.m_ECS as TmpWorld;
         tmpWorld.m_TransformWidget.m_DraggablePicked = false;
         tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
         console.log("setting parent");
-        atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+        atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
         atomParent.position = Vector3.Random(-1, 1);
         this.placedInBeaker = true;
-        //this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
         var tmpWorld = this.m_ECS as TmpWorld;
-        for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-            if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
-            {
-                console.log("found beaker!");
-                var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
-                beakerEntity.carbonCounter++;
-                break;
-            }
+        for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+          if (tmpWorld.m_Interactables[i].m_Name === "Beaker") {
+            var beakerEntity = tmpWorld.m_Interactables[i] as Beaker;
+            beakerEntity.carbonCounter++;
+            break;
+          }
         }
       }
     }
   }
 
-  public SetLabelVisibility(isVisible : boolean){
+  public SetLabelVisibility(isVisible: boolean) {
 
   }
 
-  public SetMeshVisibility(isVisible : boolean){
+  public SetMeshVisibility(isVisible: boolean) {
 
   }
 
-  private InitAction(){
+  private InitAction() {
     this.actionManager.isRecursive = true;
     const researchTray = this._scene.getMeshById("ResearchTray");
     this.actionManager.registerAction(new ExecuteCodeAction(
-        {
-          trigger: ActionManager.OnIntersectionEnterTrigger,
-          parameter: {
-            mesh: researchTray,
-            usePreciseIntersection: true
-          },
+      {
+        trigger: ActionManager.OnIntersectionEnterTrigger,
+        parameter: {
+          mesh: researchTray,
+          usePreciseIntersection: true
         },
-        () => {
-            var tmpWorld = this.m_ECS as TmpWorld
-            for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-                if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray")
-                {
-                    var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
-                    if (researchTrayEntity.inUse) break;
-                    else
-                    {
-                        researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine with four hydrogen to get CH4 or with two oxygen to get CO2"
-                        researchTrayEntity.inUse = true;
-                        this.usingResearchTray = true;
-                        break;
-                    }
-                }
+      },
+      () => {
+        var tmpWorld = this.m_ECS as TmpWorld
+        for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+          if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray") {
+            var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
+            if (researchTrayEntity.inUse) break;
+            else {
+              tmpWorld.m_putOnTraySound.play();
+              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine one carbon with two hydrogen to get CH4 or one carbon with one oxygen to get CO2!"
+              researchTrayEntity.inUse = true;
+              this.usingResearchTray = true;
+              break;
             }
+          }
         }
-      )
+      }
+    )
     );
 
     this.actionManager.registerAction(new ExecuteCodeAction(
+      {
+        trigger: ActionManager.OnIntersectionExitTrigger,
+        parameter: {
+          mesh: researchTray,
+          usePreciseIntersection: true
+        },
+      },
+      () => {
+        if (this.usingResearchTray) {
+          var tmpWorld = this.m_ECS as TmpWorld
+          for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+            if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray") {
+              tmpWorld.m_putOnTraySound.stop();
+              var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
+              researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
+              researchTrayEntity.inUse = false;
+              this.usingResearchTray = false;
+              break;
+            }
+          }
+        }
+      }
+    )
+    );
+
+    this.actionManager.registerAction(
+      new ExecuteCodeAction(
         {
-          trigger: ActionManager.OnIntersectionExitTrigger,
-          parameter: {
-            mesh: researchTray,
-            usePreciseIntersection: true
-          },
+          trigger: ActionManager.OnPickDownTrigger,
         },
         () => {
-            if (this.usingResearchTray)
-            {
-                var tmpWorld = this.m_ECS as TmpWorld
-                for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-                    if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray")
-                    {
-                        var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
-                        researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
-                        researchTrayEntity.inUse = false;
-                        this.usingResearchTray = false;
-                        break;
-                    }
-                }
-            }
+          this.m_TextPlane.m_Mesh.isVisible = true;
         }
       )
     );
 
     this.actionManager.registerAction(
-        new ExecuteCodeAction(
-            {
-                trigger: ActionManager.OnPickDownTrigger,
-            },
-            () => {
-                this.m_TextPlane.m_Mesh.isVisible = true;
-            }
-          )
-    );
-
-    this.actionManager.registerAction(
-        new ExecuteCodeAction(
-            {
-                trigger: ActionManager.OnPickUpTrigger,
-            },
-            () => {
-                this.m_TextPlane.m_Mesh.isVisible = false;
-            }
-          )
+      new ExecuteCodeAction(
+        {
+          trigger: ActionManager.OnPickUpTrigger,
+        },
+        () => {
+          this.m_TextPlane.m_Mesh.isVisible = false;
+        }
+      )
     );
 
     const otherMesh = this._scene.getMeshById("Sink");
     this.actionManager.registerAction(new ExecuteCodeAction(
-        {
-          trigger: ActionManager.OnIntersectionEnterTrigger,
-          parameter: {
-            mesh: otherMesh,
-          },
+      {
+        trigger: ActionManager.OnIntersectionEnterTrigger,
+        parameter: {
+          mesh: otherMesh,
         },
-        () => {
-          if (this.parent?.parent?.name === "Beaker") return;
-            var tmpWorld = this.m_ECS as TmpWorld
-            for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-                if (tmpWorld.m_Interactables[i].m_Name == this.name)
-                    tmpWorld.m_Interactables.splice(i, 1);
-            }
-            this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
-            this.m_Rigidbody.m_Mesh.dispose();
-            this.m_CarbonModelEntity.m_Model.m_Mesh.dispose();
-            this.m_TextPlane.m_Mesh.dispose();
-            this.Destroy();
-            this.m_CarbonModelEntity.Destroy();
+      },
+      () => {
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
+        var tmpWorld = this.m_ECS as TmpWorld
+        for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+          if (tmpWorld.m_Interactables[i].m_Name == this.name)
+            tmpWorld.m_Interactables.splice(i, 1);
         }
-      )
+        this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+        this.m_Rigidbody.m_Mesh.dispose();
+        this.m_CarbonModelEntity.m_Model.m_Mesh.dispose();
+        this.m_TextPlane.m_Mesh.dispose();
+        this.Destroy();
+        this.m_CarbonModelEntity.Destroy();
+      }
+    )
     );
 
     const otherMesh2 = this._scene.getMeshById("Sink2");
     this.actionManager.registerAction(new ExecuteCodeAction(
-        {
-          trigger: ActionManager.OnIntersectionEnterTrigger,
-          parameter: {
-            mesh: otherMesh2,
-          },
+      {
+        trigger: ActionManager.OnIntersectionEnterTrigger,
+        parameter: {
+          mesh: otherMesh2,
         },
-        () => {
-          if (this.parent?.parent?.name === "Beaker") return;
-            var tmpWorld = this.m_ECS as TmpWorld
-            for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
-                if (tmpWorld.m_Interactables[i].m_Name == this.name)
-                    tmpWorld.m_Interactables.splice(i, 1);
-            }
-            this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
-            this.m_Rigidbody.m_Mesh.dispose();
-            this.m_CarbonModelEntity.m_Model.m_Mesh.dispose();
-            this.m_TextPlane.m_Mesh.dispose();
-            this.Destroy();
-            this.m_CarbonModelEntity.Destroy();
+      },
+      () => {
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
+        var tmpWorld = this.m_ECS as TmpWorld
+        for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
+          if (tmpWorld.m_Interactables[i].m_Name == this.name)
+            tmpWorld.m_Interactables.splice(i, 1);
         }
-      )
+        this.m_Rigidbody.m_Mesh.physicsImpostor.dispose();
+        this.m_Rigidbody.m_Mesh.dispose();
+        this.m_CarbonModelEntity.m_Model.m_Mesh.dispose();
+        this.m_TextPlane.m_Mesh.dispose();
+        this.Destroy();
+        this.m_CarbonModelEntity.Destroy();
+      }
+    )
     );
 
     // const beakerMesh = this._scene.getMeshById("Beaker");
@@ -254,7 +248,7 @@ export class Carbon extends Entity{
     //             this.m_TextPlane.m_Mesh.isVisible = false; //cos beaker will block the pointer or smth'
     //             let atomParent: AbstractMesh;
     //             atomParent = this.m_Model.m_Mesh.parent as AbstractMesh;
-                
+
     //             atomParent.setParent(null);
     //             //atomParent.position = beakerMesh.position;
     //             var tmpWorld = this.m_ECS as TmpWorld;
@@ -283,45 +277,45 @@ export class Carbon extends Entity{
   }
 }
 
-export class CarbonModel extends Entity{
+export class CarbonModel extends Entity {
 
-    /**
-     * @brief The model component for the Carbon atom.
-     */
-    m_Model: Model;
+  /**
+   * @brief The model component for the Carbon atom.
+   */
+  m_Model: Model;
 
-    
-    /**
-     * @brief A promise for loading the Carbon model.
-     */
-    m_Promise: Promise<ISceneLoaderAsyncResult>
 
-    /**
-     * @brief Initializes the entity by loading and displaying the Carbon model.
-     */
-    Init(): void{
-        // Add a Model component for the Carbon molecule
-        this.m_Model = this.AddComponent(Model);
-        this.m_Model.m_AssetPath = "assets/models/Carbon.glb";
+  /**
+   * @brief A promise for loading the Carbon model.
+   */
+  m_Promise: Promise<ISceneLoaderAsyncResult>
 
-        // Load the Carbon model and store the promise for future use
-        this.m_Promise = this.m_Model.LoadModel();
-        this.m_Promise.then((result)=>{
-            this.m_Model.m_Mesh.name = this.name + " Mesh";
-            this.m_Model.m_Mesh.id = this.name + " Mesh";
-            this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
-            this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
-            result.meshes.forEach((mesh)=>{
-              mesh.isPickable = false;
-            });
-            return result;
-        })
-    }
+  /**
+   * @brief Initializes the entity by loading and displaying the Carbon model.
+   */
+  Init(): void {
+    // Add a Model component for the Carbon molecule
+    this.m_Model = this.AddComponent(Model);
+    this.m_Model.m_AssetPath = "assets/models/Carbon.glb";
 
-    /**
-     * @brief Empty method to satisfy the abstract class Entity.
-     */
-    Update(): void {
+    // Load the Carbon model and store the promise for future use
+    this.m_Promise = this.m_Model.LoadModel();
+    this.m_Promise.then((result) => {
+      this.m_Model.m_Mesh.name = this.name + " Mesh";
+      this.m_Model.m_Mesh.id = this.name + " Mesh";
+      this.m_Model.m_Mesh.getChildMeshes()[0].name = this.name + " Child";
+      this.m_Model.m_Mesh.getChildMeshes()[0].id = this.name + " Child";
+      result.meshes.forEach((mesh) => {
+        mesh.isPickable = false;
+      });
+      return result;
+    })
+  }
 
-    }    
+  /**
+   * @brief Empty method to satisfy the abstract class Entity.
+   */
+  Update(): void {
+
+  }
 }

@@ -49,58 +49,63 @@ export class ControllerDrag {
 
         // Add a callback to run when the trigger button state changes
         trigger.onButtonStateChangedObservable.add(() => {
-          if (trigger.pressed) {
-            // If the trigger is pressed
-            // Check if there is a mesh under the pointer of the controller
-            if (
-              (selectedMesh =
-                this.m_ECS.m_XR.pointerSelection.getMeshUnderPointer(
-                  controller.uniqueId
-                ))
-            ) {
-              if (selectedMesh.physicsImpostor != null){
-                originalMass = selectedMesh.physicsImpostor.mass;
-                selectedMesh.physicsImpostor.setMass(0);
-              }
-              rootMesh = selectedMesh;
-              while (rootMesh.parent) {
-                //get top root of the mesh
-                if (
-                  rootMesh.name === "oculus-touch-left" ||
-                  rootMesh.name === "oculus-touch-right"
-                ) {
-                  return;
+          if (trigger.changes.pressed) {
+            if (trigger.pressed) {
+              // If the trigger is pressed
+              // Check if there is a mesh under the pointer of the controller
+              if (
+                (selectedMesh =
+                  this.m_ECS.m_XR.pointerSelection.getMeshUnderPointer(
+                    controller.uniqueId
+                  ))
+              ) {
+                if (selectedMesh.physicsImpostor != null){
+                  originalMass = selectedMesh.physicsImpostor.mass;
+                  selectedMesh.physicsImpostor.setMass(0);
                 }
-                rootMesh = rootMesh.parent as Mesh;
-              }
-              // If the mesh is not locked, calculate the distance between the mesh and the controller
-              if (!this.m_LockedMeshes.has(rootMesh)) {
-                const distance = Vector3.Distance(
-                  motioncontroller.rootMesh.getAbsolutePosition(),
-                  selectedMesh.getAbsolutePosition()
-                );
-                // If the distance is less than 1, attach the mesh to the motion controller
-                if (distance < 10) {
-                  rootMesh.setParent(motioncontroller.rootMesh);
-                  console.log("grabbed mesh is: " + rootMesh.name)
+                if (selectedMesh.name.endsWith("Tray")) return;
+                rootMesh = selectedMesh;
+                while (rootMesh.parent) {
+                  //get top root of the mesh
+                  if (
+                    rootMesh.name === "oculus-touch-left" ||
+                    rootMesh.name === "oculus-touch-right"
+                  ) {
+                    return;
+                  }
+                  rootMesh = rootMesh.parent as Mesh;
+                }
+                if (rootMesh.name == "Environment") return;
+                // If the mesh is not locked, calculate the distance between the mesh and the controller
+                if (!this.m_LockedMeshes.has(rootMesh)) {
+                  const distance = Vector3.Distance(
+                    motioncontroller.rootMesh.getAbsolutePosition(),
+                    selectedMesh.getAbsolutePosition()
+                  );
+                  // If the distance is less than 1, attach the mesh to the motion controller
+                  if (distance < 10) {
+                    rootMesh.setParent(motioncontroller.rootMesh);
+                    console.log("grabbed mesh is: " + rootMesh.name)
+                  }
                 }
               }
-            }
-          } else {
-            // If the trigger is not pressed
-            if (selectedMesh){
-              if (selectedMesh.physicsImpostor != null){
-                selectedMesh.physicsImpostor.setMass(originalMass);
+            } else {
+              // If the trigger is not pressed
+              if (selectedMesh){
+                if (selectedMesh.physicsImpostor != null){
+                  selectedMesh.physicsImpostor.setMass(originalMass);
+                }
               }
-            }
-            if (rootMesh && rootMesh.parent) {
-              // If a mesh is attached to the motion controller
-              console.log("detaching mesh: " + rootMesh.name);
-              if (rootMesh.parent.name === "oculus-touch-left" || rootMesh.parent.name === "oculus-touch-right") {
-                rootMesh.setParent(parentTransform, true, true); // Detach the mesh
+              if (rootMesh && rootMesh.parent) {
+                // If a mesh is attached to the motion controller
+                console.log("detaching mesh: " + rootMesh.name);
+                if (rootMesh.parent.name === "oculus-touch-left" || rootMesh.parent.name === "oculus-touch-right") {
+                  rootMesh.setParent(parentTransform, true, true); // Detach the mesh
+                }
               }
             }
           }
+
         });
       });
     });

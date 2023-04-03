@@ -212,6 +212,7 @@ export class ECS extends Scene {
       },
       optionalFeatures: true,
     });
+    console.log("SetupVr");
     (window as any).xr = this.m_XR;
   }
 

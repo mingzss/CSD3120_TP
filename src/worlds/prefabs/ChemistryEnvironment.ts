@@ -4,6 +4,7 @@
 */
 import { AbstractMesh, ISceneLoaderAsyncResult, MeshBuilder, PhysicsImpostor, TransformNode, Vector3 } from "babylonjs";
 import { Entity, AmbientLightSource, Model, Skybox } from "../../core";
+import { TmpWorld } from "../TmpWorld";
 
 /**
     @class
@@ -39,9 +40,9 @@ export class ChemistryEnvironment extends Entity {
     this.m_Promise.then((result) => {
       // Do nothing for now
       this.m_Model.m_Mesh.scaling.setAll(100);
-      this.getChildMeshes().forEach((mesh)=>{
-        mesh.isPickable = false;
-      });
+      // this.getChildMeshes().forEach((mesh)=>{
+      //   mesh.isPickable = false;
+      // });
       
       const groundMesh = MeshBuilder.CreateBox("Ground Mesh", {size: 1}, this.m_Scene);
       groundMesh.scaling.set(50, 5, 60);
@@ -52,7 +53,7 @@ export class ChemistryEnvironment extends Entity {
         this.m_Scene
       );
       groundMesh.position.set(0, -2.6, 0);
-      groundMesh.isPickable = false;
+      //groundMesh.isPickable = false;
 
       const wall1Mesh = MeshBuilder.CreateBox("Wall1 Mesh", {size: 1}, this.m_Scene);
       wall1Mesh.scaling.set(5, 20, 60);
@@ -161,10 +162,24 @@ export class ChemistryEnvironment extends Entity {
       chemicalTableMesh.position.set(16, 2.9, -0.3);
       chemicalTableMesh.isPickable = false;
       chemicalTableMesh.visibility = 0;
+
+      var roomMeshes = (this.m_ECS as TmpWorld).m_ChemistryEnvironment.m_Model.m_Mesh.getChildMeshes();
+      for (let i = 0; i < roomMeshes.length; i++) {
+        if (roomMeshes[i].name === "pPlane1_lambert1_0") { //exclude the room model
+            this.m_ECS.m_LocomotionFeature.m_Teleportation.addFloorMesh(roomMeshes[i]);
+            break;
+        }
+        else{
+          this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(roomMeshes[i]);
+        }
+      }
+
     });
 
     // Create the ambient light source object
     this.m_AmbientLightSource = this.AddComponent(AmbientLightSource);
+
+
   }
 
   /**

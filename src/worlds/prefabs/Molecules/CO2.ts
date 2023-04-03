@@ -35,13 +35,14 @@ export class CO2 extends Entity{
       );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
     this.m_Rigidbody.m_Mesh.setParent(this);
+    this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
     this.m_CO2ModelEntity = this.m_ECS.Instantiate(CO2Model, "CO2 Model");
     this.m_CO2ModelEntity.scaling.setAll(0.5);
     this.m_CO2ModelEntity.setParent(this.m_Rigidbody.m_Mesh);
     const beaker = (this.m_ECS as TmpWorld).m_Beaker;
     var tmp = beaker.m_Rigidbody.m_Mesh;
-    this.position.set(tmp.absolutePosition._x, tmp.absolutePosition._y, 1.5 + tmp.absolutePosition._z);
+    this.position.set(tmp.position._x, tmp.position._y, -2.5 + tmp.position._z);
 
     this.m_TextPlane = this.AddComponent(TextPlane);
     this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI / 2, 0);
@@ -77,8 +78,7 @@ export class CO2 extends Entity{
         var tmpWorld = this.m_ECS as TmpWorld;
         tmpWorld.m_TransformWidget.m_DraggablePicked = false;
         tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
-
-        atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+        atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
         atomParent.position = Vector3.Random(-1, 1);
         this.placedInBeaker = true;
         var tmpWorld = this.m_ECS as TmpWorld;
@@ -112,7 +112,8 @@ export class CO2 extends Entity{
             var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
             if (researchTrayEntity.inUse) break;
             else {
-              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Can't combine with any atoms to further develop this molecule"
+              tmpWorld.m_putOnTraySound.play();
+              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine one CO2 with one H2O to get H2CO3!"
               researchTrayEntity.inUse = true;
               this.usingResearchTray = true;
               break;
@@ -136,6 +137,7 @@ export class CO2 extends Entity{
           var tmpWorld = this.m_ECS as TmpWorld
           for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
             if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray") {
+              tmpWorld.m_putOnTraySound.stop();
               var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
               researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
               researchTrayEntity.inUse = false;
@@ -179,7 +181,7 @@ export class CO2 extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)
@@ -204,7 +206,7 @@ export class CO2 extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)

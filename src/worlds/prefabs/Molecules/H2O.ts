@@ -36,6 +36,7 @@ export class H2O extends Entity{
       );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
     this.m_Rigidbody.m_Mesh.setParent(this);
+    this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
     this.m_H2OModelEntity = this.m_ECS.Instantiate(H2OModel, "H2O Model");
     this.m_H2OModelEntity.scaling.setAll(0.5);
@@ -43,7 +44,7 @@ export class H2O extends Entity{
     this.m_H2OModelEntity.position.set(0, 0.05, 0);
     const beaker = (this.m_ECS as TmpWorld).m_Beaker;
     var tmp = beaker.m_Rigidbody.m_Mesh;
-    this.position.set(tmp.absolutePosition._x, tmp.absolutePosition._y, 1.5 + tmp.absolutePosition._z);
+    this.position.set(tmp.position._x, tmp.position._y, -2.5 + tmp.position._z);
 
     this.m_TextPlane = this.AddComponent(TextPlane);
     this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI / 2, 0);
@@ -81,7 +82,7 @@ export class H2O extends Entity{
         tmpWorld.m_TransformWidget.m_DraggablePicked = false;
         tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
         console.log("setting parent");
-        atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+        atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
         atomParent.position = Vector3.Random(-1, 1);
         this.placedInBeaker = true;
         var tmpWorld = this.m_ECS as TmpWorld;
@@ -116,7 +117,7 @@ export class H2O extends Entity{
             var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
             if (researchTrayEntity.inUse) break;
             else {
-              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine with one more oxygen to get H2O2"
+              researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine one H2O with one CO2 to get H2CO3!"
               researchTrayEntity.inUse = true;
               this.usingResearchTray = true;
               break;
@@ -184,7 +185,7 @@ export class H2O extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)
@@ -209,7 +210,7 @@ export class H2O extends Entity{
         },
       },
       () => {
-        if (this.parent?.parent?.name === "Beaker") return;
+        if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == this.name)

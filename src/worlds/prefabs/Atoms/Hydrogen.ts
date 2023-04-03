@@ -37,6 +37,7 @@ export class Hydrogen extends Entity{
         );
       this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
       this.m_Rigidbody.m_Mesh.setParent(this);
+      this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
       this.m_HydrogenModelEntity = this.m_ECS.Instantiate(HydrogenModel, "Hydrogen Model");
       this.m_HydrogenModelEntity.scaling.setAll(0.5);
@@ -81,10 +82,9 @@ export class Hydrogen extends Entity{
         tmpWorld.m_TransformWidget.m_DraggablePicked = false;
         tmpWorld.m_TransformWidget.m_CameraToPickedTargetLine.setEnabled(false);
         console.log("setting parent");
-        atomParent.setParent(beaker.m_Rigidbody.m_Mesh);
+        atomParent.setParent(beaker.m_BeakerModelEntity.m_Model.m_Mesh);
         atomParent.position = Vector3.Random(-1, 1);
         this.placedInBeaker = true;
-        //this.m_Model.m_Entity.removeBehavior(this.sixDofDragBehavior);
         var tmpWorld = this.m_ECS as TmpWorld;
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
             if (tmpWorld.m_Interactables[i].m_Name === "Beaker")
@@ -100,7 +100,7 @@ export class Hydrogen extends Entity{
   }
 
   private InitAction(){
-    this.actionManager.isRecursive = true;
+    //this.actionManager.isRecursive = true;
     const researchTray = this._scene.getMeshById("ResearchTray");
     this.actionManager.registerAction(new ExecuteCodeAction(
         {
@@ -118,7 +118,8 @@ export class Hydrogen extends Entity{
                     var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
                     if (researchTrayEntity.inUse) break;
                     else {
-                        researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine four hydrogen with one carbon to get CH4 or two hydrogen with one oxygen to get H2O or combine with one chlorine to get HCL"
+                        tmpWorld.m_putOnTraySound.play();
+                        researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine two hydrogen with one carbon to get CH4 or two hydrogen with one oxygen to get two H2O or combine with one chlorine to get HCL!"
                         researchTrayEntity.inUse = true;
                         this.usingResearchTray = true;
                         break;
@@ -144,6 +145,7 @@ export class Hydrogen extends Entity{
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                     if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray")
                     {
+                        tmpWorld.m_putOnTraySound.stop();
                         var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
                         researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
                         researchTrayEntity.inUse = false;
@@ -187,7 +189,7 @@ export class Hydrogen extends Entity{
           },
         },
         () => {
-          if (this.parent?.parent?.name === "Beaker") return;
+          if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
             var tmpWorld = this.m_ECS as TmpWorld
             for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                 if (tmpWorld.m_Interactables[i].m_Name == this.name)
@@ -213,7 +215,7 @@ export class Hydrogen extends Entity{
           },
         },
         () => {
-          if (this.parent?.parent?.name === "Beaker") return;
+          if (this.parent?.parent?.parent?.parent?.name === "Beaker") return;
             var tmpWorld = this.m_ECS as TmpWorld
             for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                 if (tmpWorld.m_Interactables[i].m_Name == this.name)

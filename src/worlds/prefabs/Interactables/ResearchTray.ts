@@ -17,6 +17,7 @@ export class ResearchTray extends Entity{
     m_TextPlane: TextPlane;
 
     default: string;
+    m_Rigidbody: Cube;
 
     /**
      * @brief A promise for loading the ResearchTray model.
@@ -45,19 +46,19 @@ export class ResearchTray extends Entity{
             })
         });
 
-        const rigidbody = this.AddComponent(Cube);
-        rigidbody.m_Mesh.isPickable = false;
-        rigidbody.m_Mesh.setParent(null);
-        rigidbody.m_Mesh.scaling.set(2, 0.1, 1.5);
-        rigidbody.m_Mesh.visibility = 0;
+        this.m_Rigidbody = this.AddComponent(Cube);
+        this.m_Rigidbody.m_Mesh.isPickable = false;
+        this.m_Rigidbody.m_Mesh.setParent(null);
+        this.m_Rigidbody.m_Mesh.scaling.set(2, 0, 1.5);
+        this.m_Rigidbody.m_Mesh.visibility = 0;
         const impostor = new PhysicsImpostor(
-            rigidbody.m_Mesh,
+            this.m_Rigidbody.m_Mesh,
             PhysicsImpostor.BoxImpostor,
             { mass: 0, restitution: 0.2, friction: 0.2 },
             this.m_Scene
           );
-        rigidbody.m_Mesh.physicsImpostor = impostor;
-        rigidbody.m_Mesh.setParent(this);
+        this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
+        this.m_Rigidbody.m_Mesh.setParent(this);
 
         this.m_TextPlane = this.AddComponent(TextPlane);
         this.m_TextPlane.m_Mesh.rotation.set(0, -Math.PI /2, 0);
