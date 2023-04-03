@@ -15,10 +15,10 @@ import {createXRScene} from "./init"
 import {AuthoringData, loadAuthoringData} from "xrauthor-loader"
 
 // Call to Load Assets
-loadAuthoringData("assets/water").then((data: AuthoringData) => {
+// loadAuthoringData("assets/water").then((data: AuthoringData) => {
     // Call XR function for XR Author
-    createXRScene("renderCanvas", data);
-});
+    createXRScene("renderCanvas", null);
+// });
 
 
 

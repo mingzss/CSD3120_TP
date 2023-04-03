@@ -43,6 +43,7 @@ export class TmpWorld extends ECS{
         
     m_researchTrayEntity : Entity;
     m_putOnTraySound : Sound;
+    m_toxicBool : boolean = true;
 
     // Information Entity
     m_InfoText: InfoText;
@@ -136,25 +137,28 @@ export class TmpWorld extends ECS{
         this.m_TransformWidget = this.Instantiate(TransformWidget, "Transform Widget");
 
         // Enable Teleportation (Only works with controllers)
-        const arrowMaterial = new StandardMaterial("Arrow Material", this);
-        this.m_XRPromise.then(()=>{
-            this.m_ChemistryEnvironment.m_Promise.then(() => {
-                var labMesh = this.getLastMeshById("pPlane1_lambert1_0") as Mesh;
-                console.log(labMesh);
-                this.m_LocomotionFeature.EnableTeleportation(
-                    [labMesh], 
-                    2000,
-                    true,
-                    "#55FF99",
-                    "blue",
-                    arrowMaterial,
-                    {
-                        enabled: true,
-                        checkRadius: 2
-                    }
-                );    
-            });
-        });
+        // const arrowMaterial = new StandardMaterial("Arrow Material", this);
+        // this.m_XRPromise.then(()=>{
+        //     this.m_ChemistryEnvironment.m_Promise.then(() => {
+        //         var labMesh = this.getLastMeshById("pPlane1_lambert1_0") as Mesh;
+        //         console.log(labMesh);
+        //         this.m_LocomotionFeature.EnableTeleportation(
+        //             [labMesh], 
+        //             2000,
+        //             true,
+        //             "#55FF99",
+        //             "blue",
+        //             arrowMaterial,
+        //             {
+        //                 enabled: true,
+        //                 checkRadius: 2
+        //             }
+        //         );  
+        //         var tmpcmera = this.getCameraById('webxr');
+        //         tmpcmera.position.set(9.5, 9.5, 0) ;
+        //         console.log(tmpcmera);
+        //     });
+        // });
     
         // // Set bounding box renderer to render red
         this.getBoundingBoxRenderer().frontColor.set(1, 0, 0);
@@ -177,6 +181,19 @@ export class TmpWorld extends ECS{
         this.m_Interactables.forEach((entity)=>{
             entity.Update();
         })
+
+        // if (this.m_toxicBool)
+            // if (this.m_XR.enterExitUI) {
+                var tmpcmera = this.getCameraById('webxr');
+                if (tmpcmera.position.x > 15.0 &&
+                    tmpcmera.position.y > 1.6 &&
+                    tmpcmera.position.z > 0)
+                    
+                 tmpcmera.position.set(9.5, 9.5, 0) ;
+            //     this.m_toxicBool = false;
+            //     console.log("fouahfna");
+            // }
+
 
         this.m_TransformWidget.Update();
         
