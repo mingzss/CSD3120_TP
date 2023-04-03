@@ -120,6 +120,7 @@ export class Carbon extends Entity {
             var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
             if (researchTrayEntity.inUse) break;
             else {
+              tmpWorld.m_putOnTraySound.play();
               researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine one carbon with two hydrogen to get CH4 or one carbon with one oxygen to get CO2!"
               researchTrayEntity.inUse = true;
               this.usingResearchTray = true;
@@ -144,6 +145,7 @@ export class Carbon extends Entity {
           var tmpWorld = this.m_ECS as TmpWorld
           for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
             if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray") {
+              tmpWorld.m_putOnTraySound.stop();
               var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
               researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
               researchTrayEntity.inUse = false;

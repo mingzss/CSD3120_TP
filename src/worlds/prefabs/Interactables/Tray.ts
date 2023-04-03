@@ -102,28 +102,24 @@ export class Tray extends Entity{
                     {
                         var hName = "Hydrogen Atom " + this.hcounter.toString();
                         tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Hydrogen, hName));
-                        tmpWorld.m_hasSpawnAtoms = true;
                         this.hcounter++;
                     }
                     else if (this.m_Name == "Oxygen")
                     {
                         var oName = "Oxygen Atom " + this.ocounter.toString();
                         tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Oxygen, oName));
-                        tmpWorld.m_hasSpawnAtoms = true;
                         this.ocounter++;
                     }
                     else if (this.m_Name == "Chlorine")
                     {
                         var clName = "Chlorine Atom " + this.clcounter.toString();
                         tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Chlorine, clName));
-                        tmpWorld.m_hasSpawnAtoms = true;
                         this.clcounter++;
                     }
                     else if (this.m_Name == "Carbon")
                     {
                         var cName = "Carbon Atom " + this.ccounter.toString();
                         tmpWorld.m_Interactables.push(tmpWorld.Instantiate(Carbon, cName));
-                        tmpWorld.m_hasSpawnAtoms = true;
                         this.ccounter++;
                     }
                 }

@@ -115,6 +115,7 @@ export class H2CO3 extends Entity{
             var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
             if (researchTrayEntity.inUse) break;
             else {
+              tmpWorld.m_putOnTraySound.play();
               researchTrayEntity.m_TextPlane.m_TextBlock.text = "Try putting this molecule back in the beaker and shake it to see what you get!"
               researchTrayEntity.inUse = true;
               this.usingResearchTray = true;
@@ -138,6 +139,7 @@ export class H2CO3 extends Entity{
         var tmpWorld = this.m_ECS as TmpWorld
         for (let i = 0; i < tmpWorld.m_Interactables.length; i++) {
           if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray") {
+            tmpWorld.m_putOnTraySound.stop();
             var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
             researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
             researchTrayEntity.inUse = false;

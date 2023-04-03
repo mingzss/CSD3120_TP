@@ -116,6 +116,7 @@ export class Chlorine extends Entity{
                     var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
                     if (researchTrayEntity.inUse) break;
                     else {
+                        tmpWorld.m_putOnTraySound.play();
                         researchTrayEntity.m_TextPlane.m_TextBlock.text = "Combine with one hydrogen to get two HCL!"
                         researchTrayEntity.inUse = true;
                         this.usingResearchTray = true;
@@ -142,6 +143,7 @@ export class Chlorine extends Entity{
                 for (let i = 0; i < tmpWorld.m_Interactables.length; i++){
                     if (tmpWorld.m_Interactables[i].m_Name == "ResearchTray")
                     {
+                        tmpWorld.m_putOnTraySound.stop();
                         var researchTrayEntity = tmpWorld.m_Interactables[i] as ResearchTray
                         researchTrayEntity.m_TextPlane.m_TextBlock.text = researchTrayEntity.default
                         researchTrayEntity.inUse = false;
