@@ -3,6 +3,7 @@
     @brief A class that offers utility functions to enable locomotion features
 */
 import {
+  AbstractMesh,
   Material,
   Mesh,
   WebXRControllerMovement,
@@ -11,6 +12,7 @@ import {
 } from "babylonjs";
 import { ECS } from "../ECS";
 import { Entity } from "../Entity";
+import { TmpWorld } from "../../worlds/TmpWorld";
 
 /**
  * This class provides locomotion functionality for XR experiences.
@@ -57,7 +59,14 @@ export class Locomotion {
     // );
 
     // Enable teleportation feature.
-    console.log(this.m_ECS.m_XR.input)
+    var roomMeshes = (this.m_ECS as TmpWorld).m_ChemistryEnvironment.m_Model.m_Mesh.getChildMeshes();
+      for (let i = 0; i < roomMeshes.length; i++) {
+        if (roomMeshes[i].name === "pPlane1_lambert1_0") { //exclude the room model
+            roomMeshes.splice(i, 1);
+            break;
+        }
+    }
+
     const teleportation =
       this.m_ECS.m_XR.baseExperience.featuresManager.enableFeature(
         WebXRFeatureName.TELEPORTATION,
@@ -65,6 +74,7 @@ export class Locomotion {
         {
           xrInput: this.m_ECS.m_XR.input,
           floorMeshes: ground,
+          pickBlockerMeshes: roomMeshes,
           timeToTeleport: teleportTime,
           useMainComponentOnly: useMainComps,
           defaultTargetMeshOptions: {
@@ -82,6 +92,7 @@ export class Locomotion {
     // Set parabolic ray options.
     teleportation.parabolicRayEnabled = parabolicOptions.enabled;
     teleportation.parabolicCheckRadius = parabolicOptions.checkRadius;
+
   }
 
   /**

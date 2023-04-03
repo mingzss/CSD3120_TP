@@ -137,28 +137,28 @@ export class TmpWorld extends ECS{
         this.m_TransformWidget = this.Instantiate(TransformWidget, "Transform Widget");
 
         // Enable Teleportation (Only works with controllers)
-        // const arrowMaterial = new StandardMaterial("Arrow Material", this);
-        // this.m_XRPromise.then(()=>{
-        //     this.m_ChemistryEnvironment.m_Promise.then(() => {
-        //         var labMesh = this.getLastMeshById("pPlane1_lambert1_0") as Mesh;
-        //         console.log(labMesh);
-        //         this.m_LocomotionFeature.EnableTeleportation(
-        //             [labMesh], 
-        //             2000,
-        //             true,
-        //             "#55FF99",
-        //             "blue",
-        //             arrowMaterial,
-        //             {
-        //                 enabled: true,
-        //                 checkRadius: 2
-        //             }
-        //         );  
-        //         var tmpcmera = this.getCameraById('webxr');
-        //         tmpcmera.position.set(9.5, 9.5, 0) ;
-        //         console.log(tmpcmera);
-        //     });
-        // });
+        const arrowMaterial = new StandardMaterial("Arrow Material", this);
+        this.m_XRPromise.then(()=>{
+            this.m_ChemistryEnvironment.m_Promise.then(() => {
+                var labMesh = this.getLastMeshById("pPlane1_lambert1_0") as Mesh;
+                console.log(labMesh);
+                this.m_LocomotionFeature.EnableTeleportation(
+                    [labMesh], 
+                    2000,
+                    true,
+                    "#55FF99",
+                    "blue",
+                    arrowMaterial,
+                    {
+                        enabled: true,
+                        checkRadius: 2
+                    }
+                );  
+                var tmpcmera = this.getCameraById('webxr');
+                tmpcmera.position.set(9.5, 9.5, 0) ;
+                console.log(tmpcmera);
+            });
+        });
     
         // // Set bounding box renderer to render red
         this.getBoundingBoxRenderer().frontColor.set(1, 0, 0);
@@ -190,11 +190,16 @@ export class TmpWorld extends ECS{
                     tmpcmera.position.z > 0)
                     
                  tmpcmera.position.set(9.5, 9.5, 0) ;
+
+
             //     this.m_toxicBool = false;
             //     console.log("fouahfna");
             // }
-
-
+                
+            
+                //  if (tmpcmera.position.y !== 9.5) {
+                //     tmpcmera.position.y = 9.5;
+                //  } 
         this.m_TransformWidget.Update();
         
     }
