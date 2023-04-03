@@ -66,7 +66,7 @@ export class Locomotion {
           xrInput: this.m_ECS.m_XR.input,
           floorMeshes: ground,
           timeToTeleport: teleportTime,
-          useMainComponentsOnly: useMainComps,
+          useMainComponentOnly: useMainComps,
           defaultTargetMeshOptions: {
             teleportationFillColor: fillColor,
             teleportationBorderColor: borderColor,
