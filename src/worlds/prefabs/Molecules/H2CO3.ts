@@ -36,6 +36,7 @@ export class H2CO3 extends Entity{
       );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
     this.m_Rigidbody.m_Mesh.setParent(this);
+    this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
     this.m_H2CO3ModelEntity = this.m_ECS.Instantiate(H2CO3Model, "H2CO3 Model");
     this.m_H2CO3ModelEntity.scaling.setAll(0.5);

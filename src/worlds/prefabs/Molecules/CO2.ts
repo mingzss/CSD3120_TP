@@ -35,6 +35,7 @@ export class CO2 extends Entity{
       );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
     this.m_Rigidbody.m_Mesh.setParent(this);
+    this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
     this.m_CO2ModelEntity = this.m_ECS.Instantiate(CO2Model, "CO2 Model");
     this.m_CO2ModelEntity.scaling.setAll(0.5);

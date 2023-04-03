@@ -4,6 +4,7 @@
 */
 import { AbstractMesh, ISceneLoaderAsyncResult, MeshBuilder, PhysicsImpostor, TransformNode, Vector3 } from "babylonjs";
 import { Entity, AmbientLightSource, Model, Skybox } from "../../core";
+import { TmpWorld } from "../TmpWorld";
 
 /**
     @class
@@ -161,10 +162,24 @@ export class ChemistryEnvironment extends Entity {
       chemicalTableMesh.position.set(16, 2.9, -0.3);
       chemicalTableMesh.isPickable = false;
       chemicalTableMesh.visibility = 0;
+
+      var roomMeshes = (this.m_ECS as TmpWorld).m_ChemistryEnvironment.m_Model.m_Mesh.getChildMeshes();
+      for (let i = 0; i < roomMeshes.length; i++) {
+        if (roomMeshes[i].name === "pPlane1_lambert1_0") { //exclude the room model
+            this.m_ECS.m_LocomotionFeature.m_Teleportation.addFloorMesh(roomMeshes[i]);
+            break;
+        }
+        else{
+          this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(roomMeshes[i]);
+        }
+      }
+
     });
 
     // Create the ambient light source object
     this.m_AmbientLightSource = this.AddComponent(AmbientLightSource);
+
+
   }
 
   /**

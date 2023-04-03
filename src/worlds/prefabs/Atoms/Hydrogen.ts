@@ -37,6 +37,7 @@ export class Hydrogen extends Entity{
         );
       this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
       this.m_Rigidbody.m_Mesh.setParent(this);
+      this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
       this.m_HydrogenModelEntity = this.m_ECS.Instantiate(HydrogenModel, "Hydrogen Model");
       this.m_HydrogenModelEntity.scaling.setAll(0.5);
@@ -99,7 +100,7 @@ export class Hydrogen extends Entity{
   }
 
   private InitAction(){
-    this.actionManager.isRecursive = true;
+    //this.actionManager.isRecursive = true;
     const researchTray = this._scene.getMeshById("ResearchTray");
     this.actionManager.registerAction(new ExecuteCodeAction(
         {
