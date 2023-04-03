@@ -117,7 +117,7 @@ export class Beaker extends Entity {
     const impostor = new PhysicsImpostor(
       this.m_Rigidbody.m_Mesh,
       PhysicsImpostor.BoxImpostor,
-      { mass: 1, restitution: 0, friction: 2 },
+      { mass: 0, restitution: 0, friction: 2 },
       this.m_Scene
     );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;

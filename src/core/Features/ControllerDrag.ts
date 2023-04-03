@@ -78,7 +78,6 @@ export class ControllerDrag {
                   rootMesh = rootMesh.parent as Mesh;
                 }
                 if (rootMesh.name == "Environment") return;
-                hasPicked = true;
                 // If the mesh is not locked, calculate the distance between the mesh and the controller
                 if (!this.m_LockedMeshes.has(rootMesh)) {
                   const distance = Vector3.Distance(
@@ -107,6 +106,7 @@ export class ControllerDrag {
                   rootMesh.parent.name === "oculus-touch-right"
                 ) {
                   rootMesh.setParent(parentTransform, true, true); // Detach the mesh
+                  hasPicked = false;
                 } else {
                   rootMesh.setParent(null);
                   hasPicked = false;
