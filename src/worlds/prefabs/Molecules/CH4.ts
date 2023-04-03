@@ -36,6 +36,7 @@ export class CH4 extends Entity{
       );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
     this.m_Rigidbody.m_Mesh.setParent(this);
+    this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
     this.m_CH4ModelEntity = this.m_ECS.Instantiate(CH4Model, "CH4 Model");
     this.m_CH4ModelEntity.scaling.setAll(0.25);

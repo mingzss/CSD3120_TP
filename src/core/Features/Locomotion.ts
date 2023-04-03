@@ -19,6 +19,7 @@ import { TmpWorld } from "../../worlds/TmpWorld";
  */
 export class Locomotion {
   m_ECS: ECS;
+  m_Teleportation: WebXRMotionControllerTeleportation;
 
   /**
    * Creates a new instance of Locomotion.
@@ -59,22 +60,16 @@ export class Locomotion {
     // );
 
     // Enable teleportation feature.
-    var roomMeshes = (this.m_ECS as TmpWorld).m_ChemistryEnvironment.m_Model.m_Mesh.getChildMeshes();
-      for (let i = 0; i < roomMeshes.length; i++) {
-        if (roomMeshes[i].name === "pPlane1_lambert1_0") { //exclude the room model
-            roomMeshes.splice(i, 1);
-            break;
-        }
-    }
 
-    const teleportation =
+
+    this.m_Teleportation =
       this.m_ECS.m_XR.baseExperience.featuresManager.enableFeature(
         WebXRFeatureName.TELEPORTATION,
         "stable",
         {
           xrInput: this.m_ECS.m_XR.input,
-          floorMeshes: ground,
-          pickBlockerMeshes: roomMeshes,
+          //floorMeshes: ground,
+          //pickBlockerMeshes: roomMeshes,
           timeToTeleport: teleportTime,
           useMainComponentOnly: useMainComps,
           defaultTargetMeshOptions: {
@@ -90,8 +85,8 @@ export class Locomotion {
       console.log("registered");
       
     // Set parabolic ray options.
-    teleportation.parabolicRayEnabled = parabolicOptions.enabled;
-    teleportation.parabolicCheckRadius = parabolicOptions.checkRadius;
+    this.m_Teleportation.parabolicRayEnabled = parabolicOptions.enabled;
+    this.m_Teleportation.parabolicCheckRadius = parabolicOptions.checkRadius;
 
   }
 

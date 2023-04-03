@@ -36,6 +36,7 @@ export class H2O extends Entity{
       );
     this.m_Rigidbody.m_Mesh.physicsImpostor = impostor;
     this.m_Rigidbody.m_Mesh.setParent(this);
+    this.m_ECS.m_LocomotionFeature.m_Teleportation.addBlockerMesh(this.m_Rigidbody.m_Mesh);
 
     this.m_H2OModelEntity = this.m_ECS.Instantiate(H2OModel, "H2O Model");
     this.m_H2OModelEntity.scaling.setAll(0.5);
