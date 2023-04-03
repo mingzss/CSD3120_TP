@@ -58,8 +58,6 @@ They can then use the pointer to click and drag objects around in the world.
 
 ## Locomotion
 
-![This is an image](public/assets/textures/example3.png)
-
 Users can teleport around the room by using the controller buttons to aim at the location on the floor that they want to teleport to.
 
 ## Classroom World
